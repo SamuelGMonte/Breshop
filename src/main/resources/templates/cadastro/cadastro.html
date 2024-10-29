@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+    <!-- SweetAlert -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{css/bootstrap/css/bootstrap.min.css}">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{css/cadastro.css}">
+</head>
+<body>
+<div class="container">
+    <div class="container-cadastro">
+        <h1>Não fique de fora.</h1>
+        <form id="vendedorForm" th:action="@{/cadastrar}" method="post">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" required>
+                <small id="emailHelp" class="form-text text-muted">Seu e-mail não será compartilhado.</small>
+            </div>
+            <div class="form-group">
+                <label for="vendedorSenha">Senha</label>
+                <input type="password" class="form-control" id="vendedorSenha" name="senha" placeholder="Senha" required>
+            </div>
+            <div class="form-group">
+                <label for="vendedorConfirmaSenha">Senha novamente</label>
+                <input type="password" class="form-control" id="vendedorConfirmaSenha" name="confirmaSenha" placeholder="Senha" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </form>
+    </div>
+</div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script th:src="@{js/cadastro/cadastro.js}"> </script>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BreShop</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{css/bootstrap/css/bootstrap.min.css}">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{css/style.css}">
+</head>
+<body>
+    <div class="hero">
+        <a class="button btn-logout" style="display: none;">
+            <img th:src="@{assets/quit-icon.webp}" alt="">
+            <div class="logout">Sair</div>
+        </a>
+        <a class="button btn-login" href="/login" style="display: none;">
+            <img th:src="@{assets/user-icon.png}" alt="">
+            <div class="login">Login</div>
+        </a>
+        <div class="container mx-auto d-flex justify-content-center align-items-center">
+            <div class="text">
+                <h1><b>Olhe, <br>Compare, <br>Compre.</b> </h1>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, rem possimus! Eius ducimus harum veritatis possimus optio aperiam impedit cupiditate. Nulla maiores reprehenderit libero! Suscipit ad distinctio voluptates rem? Non.
+                    Fuga tempore impedit, alias non nesmo rerum possimus</p>
+                </div>
+            </div>
+    </div>
+
+    <div class="container">
+        <div class="container-content">
+            <div class="text-content">
+                <h1 style="text-align: center;"><b>Conosco, você terá a melhor experiência de brechós online.<b></h1>
+            </div>
+            <div class="cadastro d-flex justify-content-center align-items-center">
+                <a href="/cadastro"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre-se</button></a>
+            </div>
+            <div class="logos-slider">
+                <div class="logos-wrapper">
+                    <div class="logo-item">
+                        <img th:src="@{assets/havaianas-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/natura-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/zara-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/wepink-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/farm-logo.png}" alt="" src="">
+                    </div>
+                      <div class="logo-item">
+                        <img th:src="@{assets/havaianas-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/natura-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/zara-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/wepink-logo.png}" alt="" src="">
+                    </div>
+                    <div class="logo-item">
+                        <img th:src="@{assets/farm-logo.png}" alt="" src="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JQuery -->
+    <script th:src="@{js/jquery/jquery-3.7.1.min.js}"></script>
+    <!-- Bootstrap JS -->
+    <script defer th:src="@{css/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <!-- Auth JS -->
+    <script type="module" defer th:src="@{js/auth/auth.js}"></script>
+    <!-- Custom JS -->
+    <script th:src="@{js/index.js}"></script>
+    <!--Live reload script-->
+    <script src="http://localhost:35729/livereload.js"></script>
+    <!-- Swal -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+</body>
+</html>
