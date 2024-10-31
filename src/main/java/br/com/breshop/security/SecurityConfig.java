@@ -38,8 +38,8 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/login", "/cadastro").permitAll()
-                        .requestMatchers("/v1/usuarios/**").permitAll()
-                        .requestMatchers("/v1/vendedores/**").permitAll()
+                        .requestMatchers("/api/v1/usuarios/**").permitAll()
+                        .requestMatchers("/api/v1/vendedores/**").permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(HttpMethod.DELETE).hasAuthority(ADMIN)
                         .requestMatchers(HttpMethod.POST).permitAll()

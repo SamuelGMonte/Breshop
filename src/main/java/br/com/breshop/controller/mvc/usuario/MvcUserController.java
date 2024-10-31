@@ -1,4 +1,4 @@
-package br.com.breshop.controller.mvc.login;
+package br.com.breshop.controller.mvc.usuario;
 
 import br.com.breshop.dto.LoginUserDto;
 import br.com.breshop.entity.Usuario;
@@ -10,24 +10,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
-import br.com.breshop.entity.Vendedor;
 import br.com.breshop.service.UsuarioService;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class LoginMvcController {
+@RequestMapping("/usuarios")
+public class MvcUserController {
 
     private final UsuarioService usuarioService;
 
-    public LoginMvcController(UsuarioService usuarioService) {
+    public MvcUserController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
-    
+
     @GetMapping("/login")
     public String loginPage(Model model) {
         model.addAttribute("usuario", new Usuario());
-        return "login/login"; 
+        return "login/login";
     }
 
     @PostMapping("/logar")
@@ -49,7 +49,7 @@ public class LoginMvcController {
         }
     }
 
-    
+
 
 
 }

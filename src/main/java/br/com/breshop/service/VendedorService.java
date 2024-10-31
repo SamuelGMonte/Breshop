@@ -145,7 +145,7 @@ public class VendedorService {
         mailMessage.setTo(newVendedor.getEmail());
         mailMessage.setSubject("Complete seu cadastro no BreShop!");
         mailMessage.setText("Para confirmar sua conta, clique aqui : "
-                + "http://localhost:8080/v1/vendedores/confirmar-conta?token=" + token.getConfirmationToken());
+                + "http://localhost:8080/api/v1/vendedores/confirmar-conta?token=" + token.getConfirmationToken());
         emailService.sendEmail(mailMessage);
 
         ResponseEntity.ok("Verifique o email pelo link enviado ao seu endereço de email em até 5 minutos");

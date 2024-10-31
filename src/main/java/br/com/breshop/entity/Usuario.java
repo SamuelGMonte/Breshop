@@ -36,7 +36,7 @@ public class Usuario {
     private String senha;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ConfirmationTokenVendedor> confirmationTokenVendedors;
+    private List<ConfirmationTokenUser> confirmationTokenUsers;
 
     @CreationTimestamp
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -97,12 +97,12 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public List<ConfirmationTokenVendedor> getConfirmationTokens() {
-        return this.confirmationTokenVendedors;
+    public List<ConfirmationTokenUser> getConfirmationTokens() {
+        return this.confirmationTokenUsers;
     }
 
-    public void setConfirmationTokens(List<ConfirmationTokenVendedor> confirmationTokenVendedors) {
-        this.confirmationTokenVendedors = confirmationTokenVendedors;
+    public void setConfirmationTokens(List<ConfirmationTokenUser> confirmationTokenVendedors) {
+        this.confirmationTokenUsers = confirmationTokenVendedors;
     }
 
     public LocalDateTime getDateTimeInsert() {

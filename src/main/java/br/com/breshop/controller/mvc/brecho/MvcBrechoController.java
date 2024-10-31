@@ -1,4 +1,4 @@
-package br.com.breshop.controller.mvc.cadastro;
+package br.com.breshop.controller.mvc.brecho;
 
 import br.com.breshop.entity.Vendedor;
 import br.com.breshop.service.UsuarioService;
@@ -7,17 +7,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class SucessoMvcController {
+public class MvcBrechoController {
     private final UsuarioService usuarioService;
 
-    public SucessoMvcController(UsuarioService usuarioService) {
+    public MvcBrechoController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
 
-    @GetMapping("/cadastro-sucesso")
-    public String cadastroSucesso(Model model) {
+    @GetMapping("/cadastro-brecho")
+    public String cadastroPage(Model model) {
         model.addAttribute("vendedor", new Vendedor());
-        return "cadastro-sucesso/cadastro-sucesso";
+        return "cadastro-brecho/cadastro-brecho";
     }
 }

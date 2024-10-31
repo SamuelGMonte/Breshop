@@ -5,15 +5,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import br.com.breshop.dto.CreateUsuarioDto;
+import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
+import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.security.jwt.JWTGenerator;
+import br.com.breshop.service.UsuarioDetailsService;
+import br.com.breshop.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,39 +28,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.exception.UserAlreadyExistsException;
-import br.com.breshop.service.VendedorService;
 
 @RestController
-@RequestMapping("api/v1/vendedores")
-public class VendedorController {
+@RequestMapping("/api/v1/usuarios")
+public class UsuarioController {
 
-    private final VendedorService vendedorService;
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
+    private final UsuarioService usuarioService;
 
-    public VendedorController(VendedorService vendedorService,
-                              AuthenticationManager authenticationManager,
-                              JWTGenerator jwtGenerator) {
-        this.vendedorService = vendedorService;
-        this.authenticationManager = authenticationManager;
+    public UsuarioController(UsuarioService usuarioService, AuthenticationManager authenticationManager
+    ,JWTGenerator jwtGenerator) {
+        this.usuarioService = usuarioService;
         this.jwtGenerator = jwtGenerator;
+        this.authenticationManager = authenticationManager;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginVendedorDto LoginVendedorDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(LoginVendedorDto.email(), LoginVendedorDto.senha()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String token = jwtGenerator.generateToken(authentication);
-        return ResponseEntity.ok(new AuthResponseDTO("success", token));
-    }
 
     @PostMapping("/registrar")
-    public ResponseEntity<Map<String, String>> cadastrarVendedor(
-            @RequestBody CreateVendedorDto createVendedorDto,
+    public ResponseEntity<Map<String, String>> cadastrarUsuario(
+            @RequestBody CreateUsuarioDto createUsuarioDto,
             BindingResult result) {
 
         Map<String, String> response = new HashMap<>();
@@ -66,7 +60,7 @@ public class VendedorController {
         }
 
         try {
-            ResponseEntity<?> emailValidated = vendedorService.createVendedor(createVendedorDto);
+            ResponseEntity<?> emailValidated = usuarioService.createUsuario(createUsuarioDto);
             if (emailValidated.getStatusCode() == HttpStatus.OK) {
                 response.put("status", "success");
                 response.put("message", "Verifique o email pelo link enviado ao seu endereço de email");
@@ -80,9 +74,19 @@ public class VendedorController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginVendedorDto LoginVendedorDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(LoginVendedorDto.email(), LoginVendedorDto.senha()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String token = jwtGenerator.generateToken(authentication);
+        return ResponseEntity.ok(new AuthResponseDTO("success", token));
+    }
+
     @GetMapping("/confirmar-conta")
     public ResponseEntity<?> confirmUserAccount(@RequestParam("token") String confirmationToken) {
-        ResponseEntity<?> response = vendedorService.confirmEmail(UUID.fromString(confirmationToken));
+        ResponseEntity<?> response = usuarioService.confirmEmail(UUID.fromString(confirmationToken));
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.status(HttpStatus.FOUND)
@@ -93,14 +97,3 @@ public class VendedorController {
         }
     }
 }
-
-
-    // @GetMapping("/{vendedorId}")
-    // public ResponseEntity<Vendedor> getVendedorById(@PathVariable("vendedorId") String vendedorId) {
-    //     var vendedor = vendedorService.getVendedorById(UUID.fromString(vendedorId));
-    //     if (vendedor.isPresent()) {
-    //         return ResponseEntity.ok(vendedor.get());
-    //     }
-    //     return ResponseEntity.notFound().build();
-    // }
-
