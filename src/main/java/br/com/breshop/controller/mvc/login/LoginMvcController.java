@@ -1,5 +1,7 @@
-package br.com.breshop.controller.mvc;
+package br.com.breshop.controller.mvc.login;
 
+import br.com.breshop.dto.LoginUserDto;
+import br.com.breshop.entity.Usuario;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,34 +13,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
 import br.com.breshop.entity.Vendedor;
-import br.com.breshop.service.VendedorService;
+import br.com.breshop.service.UsuarioService;
 
 @Controller
 public class LoginMvcController {
 
-    private final VendedorService vendedorService;
+    private final UsuarioService usuarioService;
 
-    public LoginMvcController(VendedorService vendedorService) {
-        this.vendedorService = vendedorService;
+    public LoginMvcController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
     
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute("vendedor", new Vendedor());
+        model.addAttribute("usuario", new Usuario());
         return "login/login"; 
     }
 
     @PostMapping("/logar")
     public ResponseEntity<AuthResponseDTO> logarVendedorFromMvc(
-            @RequestBody LoginVendedorDto loginVendedorDto) {
+            @RequestBody LoginUserDto loginUsuarioDto) {
 
-        if (loginVendedorDto.senha() == null || loginVendedorDto.senha().isEmpty()) {
+        if (loginUsuarioDto.senha() == null || loginUsuarioDto.senha().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponseDTO("Senha é obrigatória."));
         }
 
         try {
-            AuthResponseDTO authResponse = vendedorService.loginVendedor(loginVendedorDto);
+            AuthResponseDTO authResponse = usuarioService.loginUsuario(loginUsuarioDto);
             return ResponseEntity.ok(authResponse);
 
         } catch (IllegalArgumentException e) {

@@ -1,5 +1,6 @@
 package br.com.breshop.security;
 
+import br.com.breshop.service.UsuarioDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,33 +27,28 @@ public class SecurityConfig {
     public static final String USER = "user";
 
     @Autowired
+    private UsuarioDetailsService usuarioDetailsService;
+    @Autowired
     private VendedorDetailsService vendedorDetailsService;
     @Autowired
     private JWTAuthEntryPoint authEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.authorizeHttpRequests((authz) -> authz.requestMatchers("/login", "/cadastro")
-                .permitAll()
-                .requestMatchers("/v1/vendedores/**")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET)
-                .permitAll()
-                .requestMatchers(HttpMethod.DELETE)
-                .hasAuthority(ADMIN)
-                .requestMatchers(HttpMethod.POST)
-                .permitAll()
-                .requestMatchers(HttpMethod.PUT)
-                .hasAuthority(USER)
-                .anyRequest()
-                .authenticated());
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/login", "/cadastro").permitAll()
+                        .requestMatchers("/v1/usuarios/**").permitAll()
+                        .requestMatchers("/v1/vendedores/**").permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .requestMatchers(HttpMethod.DELETE).hasAuthority(ADMIN)
+                        .requestMatchers(HttpMethod.POST).permitAll()
+                        .requestMatchers(HttpMethod.PUT).hasAuthority(USER)
+                        .anyRequest().authenticated())
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf -> csrf.disable());
 
-        http.exceptionHandling((exceptions) -> exceptions.authenticationEntryPoint(authEntryPoint)); // Instantiate directly here
-        http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.csrf(c -> c.disable());
-
-        
         return http.build();
     }
 
@@ -62,9 +58,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
@@ -72,3 +67,4 @@ public class SecurityConfig {
         return new JWTAuthenticationFilter();
     }
 }
+

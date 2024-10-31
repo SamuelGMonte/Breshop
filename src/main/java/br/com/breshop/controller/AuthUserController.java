@@ -1,5 +1,6 @@
 package br.com.breshop.controller;
 
+import br.com.breshop.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,26 +18,26 @@ import br.com.breshop.repository.VendedorRepository;
 import br.com.breshop.security.jwt.JWTGenerator;
 
 @RestController
-@RequestMapping("/v1/vendedores")
-public class AuthVendedorController {
-    
-    private final AuthenticationManager authenticationManager; 
+@RequestMapping("/v1/usuarios")
+public class AuthUserController {
+
+    private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
 
-    public AuthVendedorController(VendedorRepository vendedorRepository, 
-                                  PasswordEncoder passwordEncoder, 
-                                  AuthenticationManager authenticationManager,
-                                  JWTGenerator jwtGenerator) {
-        this.authenticationManager = authenticationManager; 
+    public AuthUserController(UsuarioRepository usuarioRepository,
+                              PasswordEncoder passwordEncoder,
+                              AuthenticationManager authenticationManager,
+                              JWTGenerator jwtGenerator) {
+        this.authenticationManager = authenticationManager;
         this.jwtGenerator = jwtGenerator;
     }
 
-    @PostMapping("/login") 
+    @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginVendedorDto LoginVendedorDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(LoginVendedorDto.email(), LoginVendedorDto.senha()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-      
+
         String token = jwtGenerator.generateToken(authentication);
         return ResponseEntity.ok(new AuthResponseDTO("success", token));
     }

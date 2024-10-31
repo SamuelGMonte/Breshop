@@ -27,12 +27,12 @@ $(document).ready(function() {
             data: formData,
             success: function(successMessage) {
                 Swal.fire({
-                    icon: 'success',
+                    iconHtml: '<img src="./assets/mail-logo.png" style="height: 50px;">',
                     title: 'Sucesso!',
-                    text: JSON.stringify(successMessage),
+                    text: successMessage,
                     confirmButtonText: 'OK'
                 }).then(() => {
-                
+                    // window.location.href = '/';
                 });
             },
             error: function(xhr) {
@@ -40,7 +40,7 @@ $(document).ready(function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
-                        text: JSON.stringify(xhr.responseText),
+                        text: isJSON(xhr.responseText) ? JSON.parse(xhr.responseText).error : xhr.responseText,
                         confirmButtonText: 'OK'
                     });
                 } else {
@@ -55,3 +55,12 @@ $(document).ready(function() {
         });
     });
 });
+
+function isJSON(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}

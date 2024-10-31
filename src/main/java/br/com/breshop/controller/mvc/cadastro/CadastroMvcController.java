@@ -1,4 +1,4 @@
-package br.com.breshop.controller.mvc;
+package br.com.breshop.controller.mvc.cadastro;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,34 +10,34 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import br.com.breshop.dto.CreateVendedorDto;
-import br.com.breshop.entity.Vendedor;
+import br.com.breshop.dto.CreateUsuarioDto;
+import br.com.breshop.entity.Usuario;
 import br.com.breshop.exception.UserAlreadyExistsException;
-import br.com.breshop.service.VendedorService;
+import br.com.breshop.service.UsuarioService;
 
 @Controller
 public class CadastroMvcController {
-    private final VendedorService vendedorService;
+    private final UsuarioService usuarioService;
 
-    public CadastroMvcController(VendedorService vendedorService) {
-        this.vendedorService = vendedorService;
+    public CadastroMvcController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
 
     @GetMapping("/cadastro")
     public String cadastroPage(Model model) {
-        model.addAttribute("vendedor", new Vendedor());
+        model.addAttribute("usuario", new Usuario());
         return "cadastro/cadastro";
     }
 
     @PostMapping("/cadastrar") 
-    public ResponseEntity<String> cadastrarVendedorFromMvc(
-            @ModelAttribute CreateVendedorDto createVendedorDto,
+    public ResponseEntity<String> cadastrarUsuarioFromMvc(
+            @ModelAttribute CreateUsuarioDto createUsuarioDto,
             @RequestParam String confirmaSenha,
             BindingResult result) {
 
         // Verifica se as senhas coincidem
-        if (!createVendedorDto.senha().equals(confirmaSenha)) {
+        if (!createUsuarioDto.senha().equals(confirmaSenha)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("As senhas não coincidem.");
         }
@@ -47,8 +47,8 @@ public class CadastroMvcController {
         }
 
         try {
-            vendedorService.createVendedor(createVendedorDto);
-            return ResponseEntity.ok("Cadastro realizado com sucesso!");
+            usuarioService.createUsuario(createUsuarioDto);
+            return ResponseEntity.ok("Email enviado com sucesso!");
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }

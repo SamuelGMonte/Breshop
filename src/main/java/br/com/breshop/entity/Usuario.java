@@ -19,23 +19,23 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tbl_vendedor")
-public class Vendedor {
+@Table(name = "tbl_usuario")
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer vendedorId;
+    private Integer usuarioId;
 
-    @Column(name = "vendedor_usuario")
+    @Column(name = "usuario_username")
     private String username;
 
-    @Column(name = "vendedor_email")
+    @Column(name = "usuario_email")
     private String email;
 
-    @Column(name = "vendedor_senha")
+    @Column(name = "usuario_senha")
     private String senha;
 
-    @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ConfirmationTokenVendedor> confirmationTokenVendedors;
 
     @CreationTimestamp
@@ -49,10 +49,10 @@ public class Vendedor {
 
     private boolean received;
 
-    public Vendedor() {
+    public Usuario() {
     }
 
-    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, boolean isEnabled, boolean received) {
+    public Usuario(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, boolean isEnabled, boolean received) {
         this.username = username;
         this.email = email;
         this.senha = senha;
@@ -65,12 +65,12 @@ public class Vendedor {
     // Getters and setters
 
 
-    public Integer getVendedorId() {
-        return this.vendedorId;
+    public Integer getUsuarioId() {
+        return this.usuarioId;
     }
 
-    public void setVendedorId(Integer vendedorId) {
-        this.vendedorId = vendedorId;
+    public void setUsuarioId(Integer usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public String getUsername() {
@@ -144,7 +144,7 @@ public class Vendedor {
     public void setReceived(boolean received) {
         this.received = received;
     }
-    
 
-    
+
+
 }

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import br.com.breshop.dto.CreateUsuarioDto;
+import br.com.breshop.repository.ConfirmationTokenUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,22 +15,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import br.com.breshop.dto.CreateVendedorDto;
-import br.com.breshop.dto.LoginVendedorDto;
+import br.com.breshop.dto.CreateUsuarioDto;
+import br.com.breshop.dto.LoginUserDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
-import br.com.breshop.entity.ConfirmationTokenVendedor;
-import br.com.breshop.entity.Vendedor;
+import br.com.breshop.entity.ConfirmationTokenUser;
+import br.com.breshop.entity.Usuario;
 import br.com.breshop.exception.UserAlreadyReceivedException;
 import br.com.breshop.exception.UserAlreadyExistsException;
-import br.com.breshop.repository.ConfirmationTokenRepository;
-import br.com.breshop.repository.VendedorRepository;
+import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.security.jwt.JWTGenerator;
 
 @Service
-public class VendedorService {
+public class UsuarioService{
 
     @Autowired
-    private final VendedorRepository vendedorRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -37,7 +38,7 @@ public class VendedorService {
     PasswordEncoderService passwordEncoderService;
 
     @Autowired
-    ConfirmationTokenRepository confirmationTokenRepository;
+    ConfirmationTokenUserRepository confirmationTokenUserRepository;
 
     @Autowired
     private JWTGenerator jwtg;
@@ -45,25 +46,25 @@ public class VendedorService {
     @Autowired
     EmailService emailService;
 
-    public VendedorService(VendedorRepository vendedorRepository, AuthenticationManager authenticationManager, PasswordEncoderService passwordEncoderService, ConfirmationTokenRepository confirmationTokenRepository, JWTGenerator jwtg, EmailService emailService) {
-        this.vendedorRepository = vendedorRepository;
+    public UsuarioService(UsuarioRepository usuarioRepository, AuthenticationManager authenticationManager, PasswordEncoderService passwordEncoderService, ConfirmationTokenUserRepository confirmationTokenUserRepository, JWTGenerator jwtg, EmailService emailService) {
+        this.usuarioRepository = usuarioRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoderService = passwordEncoderService;
-        this.confirmationTokenRepository = confirmationTokenRepository;
+        this.confirmationTokenUserRepository = confirmationTokenUserRepository;
         this.jwtg = jwtg;
         this.emailService = emailService;
     }
 
-    public Vendedor loadVendedor(CreateVendedorDto createVendedorDto) {
-        Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
-        return vendedorOptional.orElse(null);
+    public Usuario loadUsuario(CreateUsuarioDto createUsuarioDto) {
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(createUsuarioDto.email());
+        return usuarioOptional.orElse(null);
     }
 
-    public ConfirmationTokenVendedor checkLastToken(Vendedor vendedor) {
-        List<ConfirmationTokenVendedor> tokens = confirmationTokenRepository.findAllByVendedor(vendedor);
+    public ConfirmationTokenUser checkLastToken(Usuario usuario) {
+        List<ConfirmationTokenUser> tokens = confirmationTokenUserRepository.findAllByUsuario(usuario);
 
-        ConfirmationTokenVendedor lastToken = tokens.stream()
-                .max(Comparator.comparing(ConfirmationTokenVendedor::getCreatedDate))
+        ConfirmationTokenUser lastToken = tokens.stream()
+                .max(Comparator.comparing(ConfirmationTokenUser::getCreatedDate))
                 .orElse(null);
 
         LocalDateTime currentTime = LocalDateTime.now();
@@ -75,8 +76,8 @@ public class VendedorService {
         }
 
         // Cria um novo token
-        ConfirmationTokenVendedor token = new ConfirmationTokenVendedor();
-        token.setVendedor(vendedor);
+        ConfirmationTokenUser token = new ConfirmationTokenUser();
+        token.setUser(usuario);
         token.setConfirmationToken(UUID.randomUUID());
         token.setCreatedDate(LocalDateTime.now());
         token.setDateExpiration(LocalDateTime.now().plusMinutes(5));
@@ -84,96 +85,96 @@ public class VendedorService {
         return token;
     }
 
-    public ResponseEntity<?> createVendedor(CreateVendedorDto createVendedorDto) {
+    public ResponseEntity<?> createUsuario(CreateUsuarioDto createUsuarioDto) {
 
-        if (createVendedorDto.senha() == null || createVendedorDto.senha().isEmpty()) {
+        if (createUsuarioDto.senha() == null || createUsuarioDto.senha().isEmpty()) {
             throw new IllegalArgumentException("Senha não pode ser nula");
         }
 
-        Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(createUsuarioDto.email());
 
-        ConfirmationTokenVendedor token;
-        if (vendedorOptional.isPresent()) {
-            Vendedor existingVendedor = vendedorOptional.get();
+        ConfirmationTokenUser token;
+        if (usuarioOptional.isPresent()) {
+            Usuario existingUsuario = usuarioOptional.get();
 
-            if (!existingVendedor.getIsEnabled()) {
-                token = this.checkLastToken(existingVendedor);
+            if (!existingUsuario.getIsEnabled()) {
+                token = this.checkLastToken(existingUsuario);
                 // Envio de e-mail
-                return sendConfirmationEmail(createVendedorDto, token);
+                return sendConfirmationEmail(createUsuarioDto, token);
             } else {
                 throw new UserAlreadyExistsException("Usuário já existe");
             }
         }
 
-        // Caso vendedor não exista, cria um novo
-        Vendedor newVendedor = new Vendedor(
-                createVendedorDto.username(),
-                createVendedorDto.email(),
-                passwordEncoderService.encode(createVendedorDto.senha()),
+        // Caso usuario não exista, cria um novo
+        Usuario newUsuario = new Usuario(
+                createUsuarioDto.username(),
+                createUsuarioDto.email(),
+                passwordEncoderService.encode(createUsuarioDto.senha()),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 false,  // isEnabled
                 false   // received
         );
 
-        vendedorRepository.save(newVendedor);
+        usuarioRepository.save(newUsuario);
 
         // Criação do token
-        token = new ConfirmationTokenVendedor();
-        token.setVendedor(newVendedor);
+        token = new ConfirmationTokenUser();
+        token.setUser(newUsuario);
         token.setConfirmationToken(UUID.randomUUID());
         token.setCreatedDate(LocalDateTime.now());
         token.setDateExpiration(LocalDateTime.now().plusMinutes(5));
 
-        // Envio de e-mail para novo vendedor
-        return sendConfirmationEmail(createVendedorDto, token);
+        // Envio de e-mail para novo usuario
+        return sendConfirmationEmail(createUsuarioDto, token);
     }
 
 
 
-    public void sendEmail(CreateVendedorDto createVendedorDto, ConfirmationTokenVendedor token) {
-        Vendedor newVendedor = new Vendedor(createVendedorDto.username(), createVendedorDto.email(), createVendedorDto.senha(),
+    public void sendEmail(CreateUsuarioDto createUsuarioDto, ConfirmationTokenUser token) {
+        Usuario newUsuario = new Usuario(createUsuarioDto.username(), createUsuarioDto.email(), createUsuarioDto.senha(),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 false,
                 false
         );
 
-        confirmationTokenRepository.save(token);
+        confirmationTokenUserRepository.save(token);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newVendedor.getEmail());
+        mailMessage.setTo(newUsuario.getEmail());
         mailMessage.setSubject("Complete seu cadastro no BreShop!");
         mailMessage.setText("Para confirmar sua conta, clique aqui : "
-                + "http://localhost:8080/v1/vendedores/confirmar-conta?token=" + token.getConfirmationToken());
+                + "http://localhost:8080/v1/usuarios/confirmar-conta?token=" + token.getConfirmationToken());
         emailService.sendEmail(mailMessage);
 
         ResponseEntity.ok("Verifique o email pelo link enviado ao seu endereço de email em até 5 minutos");
     }
 
-    public AuthResponseDTO loginVendedor(LoginVendedorDto loginVendedorDto) {
-        if (loginVendedorDto.email() == null || loginVendedorDto.email().isEmpty()) {
+    public AuthResponseDTO loginUsuario(LoginUserDto loginUsuarioDto) {
+        if (loginUsuarioDto.email() == null || loginUsuarioDto.email().isEmpty()) {
             throw new IllegalArgumentException("Email é obrigatório.");
         }
 
-        Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(loginVendedorDto.email());
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(loginUsuarioDto.email());
 
-        // Verifica se o vendedor foi encontrado
-        if (vendedorOptional.isEmpty()) {
+        // Verifica se o usuario foi encontrado
+        if (usuarioOptional.isEmpty()) {
             throw new IllegalArgumentException("Credenciais inválidas");
         }
 
-        Vendedor vendedor = vendedorOptional.get();
+        Usuario usuario = usuarioOptional.get();
 
 
         // Verifica se a senha informada corresponde à senha armazenada
-        if (!passwordEncoderService.matches(loginVendedorDto.senha(), vendedor.getSenha())) {
+        if (!passwordEncoderService.matches(loginUsuarioDto.senha(), usuario.getSenha())) {
             throw new IllegalArgumentException("Credenciais inválidas");
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                vendedor.getEmail(),
-                loginVendedorDto.senha()
+            usuario.getEmail(),
+            loginUsuarioDto.senha()
         );
 
         // Autentica o usuário
@@ -188,41 +189,41 @@ public class VendedorService {
     public ResponseEntity<Map<String, String>> confirmEmail(UUID token) {
         Map<String, String> response = new HashMap<>();
 
-        ConfirmationTokenVendedor confirmationTokenVendedor = confirmationTokenRepository.findByConfirmationToken(token);
+        ConfirmationTokenUser confirmationTokenUsuario = confirmationTokenUserRepository.findByConfirmationToken(token);
 
-        if (confirmationTokenVendedor == null) {
+        if (confirmationTokenUsuario == null) {
             response.put("error", "Token inválido ou expirado");
             return ResponseEntity.badRequest().body(response);
         }
 
-        Vendedor vendedor = confirmationTokenVendedor.getVendedor();
+        Usuario usuario = confirmationTokenUsuario.getUser();
 
-        if (vendedor == null) {
-            response.put("error", "Vendedor não encontrado");
+        if (usuario == null) {
+            response.put("error", "Usuario não encontrado");
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (confirmationTokenVendedor.getDateExpiration().isBefore(LocalDateTime.now())) {
+        if (confirmationTokenUsuario.getDateExpiration().isBefore(LocalDateTime.now())) {
             response.put("error", "Token expirado");
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (vendedor.getIsEnabled()) {
+        if (usuario.getIsEnabled()) {
             response.put("error", "Conta já confirmada");
             return ResponseEntity.badRequest().body(response);
         }
 
-        vendedor.setIsEnabled(true);
-        vendedorRepository.save(vendedor);
+        usuario.setIsEnabled(true);
+        usuarioRepository.save(usuario);
 
         response.put("success", "Email verificado com sucesso!");
         return ResponseEntity.ok(response);
     }
 
 
-    private ResponseEntity<?> sendConfirmationEmail(CreateVendedorDto createVendedorDto, ConfirmationTokenVendedor token) {
+    private ResponseEntity<?> sendConfirmationEmail(CreateUsuarioDto createUsuarioDto, ConfirmationTokenUser token) {
         try {
-            this.sendEmail(createVendedorDto, token);
+            this.sendEmail(createUsuarioDto, token);
             return ResponseEntity.ok("E-mail de confirmação enviado.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao enviar o e-mail de confirmação");
