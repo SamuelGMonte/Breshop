@@ -8,7 +8,17 @@ $(document).ready(function() {
         event.preventDefault();
 
         const email = $('#email').val(); 
-        const senha = $('#vendedorSenha').val(); 
+        const senha = $('#vendedorSenha').val();
+
+        if (!email || !senha) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                text: 'Por favor, preencha todos os campos.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
 
         const loginData = {
             email: email,

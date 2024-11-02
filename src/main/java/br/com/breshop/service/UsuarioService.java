@@ -6,6 +6,7 @@ import java.util.*;
 
 import br.com.breshop.dto.CreateUsuarioDto;
 import br.com.breshop.repository.ConfirmationTokenUserRepository;
+import br.com.breshop.repository.VendedorRepository;
 import br.com.breshop.security.CustomAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,8 @@ public class UsuarioService{
 
     private final UsuarioRepository usuarioRepository;
 
+    private final VendedorRepository vendedorRepository;
+
     private CustomAuthManager authenticationManager;
 
     PasswordEncoder passwordEncoderService;
@@ -44,8 +47,9 @@ public class UsuarioService{
     EmailService emailService;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, CustomAuthManager authenticationManager, PasswordEncoder passwordEncoderService, ConfirmationTokenUserRepository confirmationTokenUserRepository, JWTGenerator jwtg, EmailService emailService) {
+    public UsuarioService(UsuarioRepository usuarioRepository, VendedorRepository vendedorRepository, CustomAuthManager authenticationManager, PasswordEncoder passwordEncoderService, ConfirmationTokenUserRepository confirmationTokenUserRepository, JWTGenerator jwtg, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
+        this.vendedorRepository = vendedorRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoderService = passwordEncoderService;
         this.confirmationTokenUserRepository = confirmationTokenUserRepository;
@@ -87,6 +91,10 @@ public class UsuarioService{
 
         if (createUsuarioDto.senha() == null || createUsuarioDto.senha().isEmpty()) {
             throw new IllegalArgumentException("Senha não pode ser nula");
+        }
+
+        if(vendedorRepository.findByEmail(createUsuarioDto.email()).isPresent()) {
+            throw new IllegalArgumentException("Usuário já esta cadastrado como vendedor");
         }
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(createUsuarioDto.email());
@@ -159,6 +167,10 @@ public class UsuarioService{
 
         if (usuarioOptional.isEmpty()) {
             throw new IllegalArgumentException("Usuário não encontrado");
+        }
+
+        if(usuarioRepository.findByEmail(loginUsuarioDto.email()).isPresent()) {
+            throw new IllegalArgumentException("Faça login como vendedor.");
         }
 
         // Verifica se o usuario foi encontrado

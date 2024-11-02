@@ -28,6 +28,9 @@ public class SecurityConfig {
     private UsuarioDetailsService usuarioDetailsService;
 
     @Autowired
+    private VendedorDetailsService vendedorDetailsService;
+
+    @Autowired
     private JWTAuthEntryPoint authEntryPoint;
 
     @Bean

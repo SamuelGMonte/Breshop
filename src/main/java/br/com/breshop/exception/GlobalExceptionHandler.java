@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
-    @ExceptionHandler(UserAlreadyReceivedException.class) // Changed this to the correct class name
+    @ExceptionHandler(UserAlreadyReceivedException.class)
     public ResponseEntity<Map<String, String>> handleUserAlreadyReceivedException(UserAlreadyReceivedException e) {
         Map<String, String> response = new HashMap<>();
         response.put("error", e.getMessage());

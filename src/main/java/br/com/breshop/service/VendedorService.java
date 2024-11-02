@@ -7,6 +7,7 @@ import java.util.*;
 import br.com.breshop.dto.CreateBrechoDto;
 import br.com.breshop.entity.Brecho;
 import br.com.breshop.repository.BrechoRepository;
+import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.security.CustomAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,8 @@ public class VendedorService {
 
     private final VendedorRepository vendedorRepository;
 
+    private final UsuarioRepository usuarioRepository;
+
     private final BrechoRepository brechoRepository;
 
     private CustomAuthManager authenticationManager;
@@ -48,8 +51,9 @@ public class VendedorService {
     EmailService emailService;
 
     @Autowired
-    public VendedorService(VendedorRepository vendedorRepository, CustomAuthManager authenticationManager, BCryptPasswordEncoder passwordEncoder, ConfirmationTokenRepository confirmationTokenRepository, JWTGenerator jwtg, EmailService emailService, BrechoRepository brechoRepository) {
+    public VendedorService(VendedorRepository vendedorRepository, UsuarioRepository usuarioRepository, CustomAuthManager authenticationManager, BCryptPasswordEncoder passwordEncoder, ConfirmationTokenRepository confirmationTokenRepository, JWTGenerator jwtg, EmailService emailService, BrechoRepository brechoRepository) {
         this.vendedorRepository = vendedorRepository;
+        this.usuarioRepository = usuarioRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.confirmationTokenRepository = confirmationTokenRepository;
@@ -92,6 +96,10 @@ public class VendedorService {
 
         if (createVendedorDto.senha() == null || createVendedorDto.senha().isEmpty()) {
             throw new IllegalArgumentException("Senha não pode ser nula");
+        }
+
+        if(usuarioRepository.findByEmail(createVendedorDto.email()).isPresent()) {
+            throw new IllegalArgumentException("Vendedor já esta cadastrado como usuário");
         }
 
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
@@ -175,6 +183,10 @@ public class VendedorService {
     public AuthResponseDTO loginVendedor(LoginVendedorDto loginVendedorDto) {
         if (loginVendedorDto.email() == null || loginVendedorDto.email().isEmpty()) {
             throw new IllegalArgumentException("Email é obrigatório.");
+        }
+
+        if(usuarioRepository.findByEmail(loginVendedorDto.email()).isPresent()) {
+            throw new IllegalArgumentException("Faça login como usuário.");
         }
 
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(loginVendedorDto.email());
