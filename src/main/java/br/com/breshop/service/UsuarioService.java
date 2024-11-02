@@ -6,6 +6,7 @@ import java.util.*;
 
 import br.com.breshop.dto.CreateUsuarioDto;
 import br.com.breshop.repository.ConfirmationTokenUserRepository;
+import br.com.breshop.security.CustomAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.breshop.dto.CreateUsuarioDto;
@@ -28,25 +31,20 @@ import br.com.breshop.security.jwt.JWTGenerator;
 @Service
 public class UsuarioService{
 
-    @Autowired
     private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private CustomAuthManager authenticationManager;
 
-    @Autowired
-    PasswordEncoderService passwordEncoderService;
+    PasswordEncoder passwordEncoderService;
 
-    @Autowired
     ConfirmationTokenUserRepository confirmationTokenUserRepository;
 
-    @Autowired
     private JWTGenerator jwtg;
 
-    @Autowired
     EmailService emailService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, AuthenticationManager authenticationManager, PasswordEncoderService passwordEncoderService, ConfirmationTokenUserRepository confirmationTokenUserRepository, JWTGenerator jwtg, EmailService emailService) {
+    @Autowired
+    public UsuarioService(UsuarioRepository usuarioRepository, CustomAuthManager authenticationManager, PasswordEncoder passwordEncoderService, ConfirmationTokenUserRepository confirmationTokenUserRepository, JWTGenerator jwtg, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoderService = passwordEncoderService;
@@ -159,17 +157,18 @@ public class UsuarioService{
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(loginUsuarioDto.email());
 
-        // Verifica se o usuario foi encontrado
         if (usuarioOptional.isEmpty()) {
-            throw new IllegalArgumentException("Credenciais inválidas");
+            throw new IllegalArgumentException("Usuário não encontrado");
         }
 
-        Usuario usuario = usuarioOptional.get();
+        // Verifica se o usuario foi encontrado
+
+        Usuario usuario  = usuarioOptional.get();
 
 
         // Verifica se a senha informada corresponde à senha armazenada
         if (!passwordEncoderService.matches(loginUsuarioDto.senha(), usuario.getSenha())) {
-            throw new IllegalArgumentException("Credenciais inválidas");
+            throw new IllegalArgumentException("Senha inválida");
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -230,6 +229,9 @@ public class UsuarioService{
         }
     }
 
-
+    public Usuario findByEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElse(null);
+    }
 
 }

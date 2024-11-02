@@ -1,9 +1,14 @@
 package br.com.breshop.security;
 
+import br.com.breshop.service.PasswordEncoderService;
 import br.com.breshop.service.UsuarioDetailsService;
+import br.com.breshop.security.jwt.JWTAuthEntryPoint;
+import br.com.breshop.security.jwt.JWTAuthenticationFilter;
+import br.com.breshop.service.VendedorDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,21 +20,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import br.com.breshop.security.jwt.JWTAuthEntryPoint;
-import br.com.breshop.security.jwt.JWTAuthenticationFilter;
-import br.com.breshop.service.VendedorDetailsService;
-
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    public static final String ADMIN = "admin";
-    public static final String USER = "user";
 
     @Autowired
     private UsuarioDetailsService usuarioDetailsService;
-    @Autowired
-    private VendedorDetailsService vendedorDetailsService;
+
     @Autowired
     private JWTAuthEntryPoint authEntryPoint;
 
@@ -37,13 +34,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/login", "/cadastro").permitAll()
+                        .requestMatchers("usuarios/login", "usuarios/cadastro", "vendedores/login", "vendedores/cadastro").permitAll()
                         .requestMatchers("/api/v1/usuarios/**").permitAll()
                         .requestMatchers("/api/v1/vendedores/**").permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.DELETE).hasAuthority(ADMIN)
                         .requestMatchers(HttpMethod.POST).permitAll()
-                        .requestMatchers(HttpMethod.PUT).hasAuthority(USER)
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,13 +48,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    @Primary
+    public AuthenticationManager customAuthenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     @Bean
@@ -67,4 +63,3 @@ public class SecurityConfig {
         return new JWTAuthenticationFilter();
     }
 }
-

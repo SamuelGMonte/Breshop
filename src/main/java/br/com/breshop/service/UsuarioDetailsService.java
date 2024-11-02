@@ -11,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import br.com.breshop.entity.Vendedor;
-import br.com.breshop.repository.VendedorRepository;
 
 @Service
 public class UsuarioDetailsService implements UserDetailsService {
@@ -23,6 +21,7 @@ public class UsuarioDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+
         if (usuario.isPresent()) {
             return new org.springframework.security.core.userdetails.User(
                     usuario.get().getEmail(),

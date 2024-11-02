@@ -11,14 +11,29 @@
 </head>
 <body>
     <div class="hero">
-        <a class="button btn-logout" style="display: none;">
+        <a class="button btn-logout anchor_dropdown" style="display: none;">
             <img th:src="@{assets/quit-icon.webp}" alt="">
             <div class="logout">Sair</div>
         </a>
-        <a class="button btn-login" href="/login" style="display: none;">
-            <img th:src="@{assets/user-icon.png}" alt="">
-            <div class="login">Login</div>
-        </a>
+        <div class="login-container">
+            <a class="button btn-login anchor_dropdown" href="/usuarios/login" style="text-align: center;  width: 100px;" >
+                <div class="login center-text">Usuário</div>
+                <span class="center-text">Login como</span>
+            </a>
+            <a class="button btn-login anchor_dropdown" href="/vendedores/login" style="text-align: center; width: 100px;">
+                <div class="login center-text">Vendedor</div>
+                <span class="center-text">Login como</span>
+            </a>
+
+            <!-- <a class="btn-mobile" href="/usuarios/login" style="display: none;"> -->
+                <!-- <div class="login-user center-text">Usuário</div>
+                <span class="center-text" >Login</span>
+            </a>
+            <a class="btn-mobile" href="/vendedores/login" style="display: none;">
+                <div class="login-vendedor center-text">Vendedor</div>
+                <span class="center-text">Login</span> -->
+            </a>
+        </div>
         <div class="container mx-auto d-flex justify-content-center align-items-center">
             <div class="text">
                 <h1><b>Olhe, <br>Compare, <br>Compre.</b> </h1>
@@ -33,12 +48,12 @@
             <div class="text-content">
                 <h1 style="text-align: center;"><b>Conosco, você terá a melhor experiência de brechós online.<b></h1>
             </div>
-            <div class="cadastro-container d-flex justify-content-around">
-                <div class="cadastro" style="text-align: center;">
-                    <a href="/cadastro"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre-se</button></a>
+            <div class="cadastro-container">
+                <div class="cadastro cadastro-usuario" style="text-align: center;">
+                    <a href="usuarios/cadastro"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre-se</button></a>
                 </div>
-                <div class="cadastro-brecho" style="text-align: center;">
-                    <a href="/cadastro-brecho"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre seu brechó</button></a>
+                <div class="cadastro cadastro-brecho" style="text-align: center;">
+                    <a href="vendedores/cadastro-brecho"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre seu brechó</button></a>
                 </div>
             </div>
             <div class="logos-slider">

@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import br.com.breshop.dto.CreateBrechoDto;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
+import br.com.breshop.entity.Usuario;
 import br.com.breshop.security.jwt.JWTGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,30 +33,40 @@ import br.com.breshop.service.VendedorService;
 public class VendedorController {
 
     private final VendedorService vendedorService;
-    private final AuthenticationManager authenticationManager;
-    private final JWTGenerator jwtGenerator;
 
-    public VendedorController(VendedorService vendedorService,
-                              AuthenticationManager authenticationManager,
-                              JWTGenerator jwtGenerator) {
+    public VendedorController(VendedorService vendedorService) {
         this.vendedorService = vendedorService;
-        this.authenticationManager = authenticationManager;
-        this.jwtGenerator = jwtGenerator;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginVendedorDto LoginVendedorDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(LoginVendedorDto.email(), LoginVendedorDto.senha()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginVendedorDto LoginVendedorDto,
+                                                     BindingResult result) {
+        Map<String, String> response = new HashMap<>();
 
-        String token = jwtGenerator.generateToken(authentication);
-        return ResponseEntity.ok(new AuthResponseDTO("success", token));
+        if (LoginVendedorDto.senha() == null || LoginVendedorDto.senha().isEmpty()) {
+            response.put("status", "error");
+            response.put("message", "Senha vazia.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            AuthResponseDTO authResponse = vendedorService.loginVendedor(LoginVendedorDto);
+            response.put("status", "success");
+            response.put("message", "Usuário criado com sucesso, token: " + authResponse.getToken());
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+
     }
 
     @PostMapping("/registrar")
     public ResponseEntity<Map<String, String>> cadastrarVendedor(
             @RequestBody CreateVendedorDto createVendedorDto,
+            @RequestBody CreateBrechoDto createBrechoDto,
             BindingResult result) {
 
         Map<String, String> response = new HashMap<>();
@@ -66,7 +78,7 @@ public class VendedorController {
         }
 
         try {
-            ResponseEntity<?> emailValidated = vendedorService.createVendedor(createVendedorDto);
+            ResponseEntity<?> emailValidated = vendedorService.createVendedor(createVendedorDto, createBrechoDto);
             if (emailValidated.getStatusCode() == HttpStatus.OK) {
                 response.put("status", "success");
                 response.put("message", "Verifique o email pelo link enviado ao seu endereço de email");
@@ -92,7 +104,11 @@ public class VendedorController {
             return ResponseEntity.badRequest().body("Token inválido.");
         }
     }
+
+
+
 }
+
 
 
     // @GetMapping("/{vendedorId}")

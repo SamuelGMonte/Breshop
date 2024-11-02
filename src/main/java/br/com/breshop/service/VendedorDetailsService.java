@@ -21,11 +21,11 @@ public class VendedorDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<Vendedor> vendedor = vendedorRepository.findByEmail(email);
-        if (vendedor.isPresent()) {
+        if (!vendedor.isPresent()) {
             return new org.springframework.security.core.userdetails.User(
                     vendedor.get().getEmail(),
                     vendedor.get().getSenha(),
-                    new ArrayList<>() 
+                    new ArrayList<>()
             );
         } else {
             throw new UsernameNotFoundException("Usuário não encontrado com email: " + email);

@@ -1,22 +1,14 @@
 package br.com.breshop.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List; // Import List
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tbl_vendedor")
@@ -29,7 +21,7 @@ public class Vendedor {
     @Column(name = "vendedor_usuario")
     private String username;
 
-    @Column(name = "vendedor_email")
+    @Column(name = "vendedor_email", unique = true)
     private String email;
 
     @Column(name = "vendedor_senha")
@@ -37,6 +29,14 @@ public class Vendedor {
 
     @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ConfirmationTokenVendedor> confirmationTokenVendedors;
+
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_vendedor_brecho",
+            joinColumns = @JoinColumn(name = "tbl_vendedor_id"),
+            inverseJoinColumns = @JoinColumn(name = "tbl_brecho_id")
+    )
+    private List<Brecho> brechos = new ArrayList<>();
 
     @CreationTimestamp
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -52,7 +52,7 @@ public class Vendedor {
     public Vendedor() {
     }
 
-    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, boolean isEnabled, boolean received) {
+    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, boolean isEnabled, boolean received, List<Brecho> brechos) {
         this.username = username;
         this.email = email;
         this.senha = senha;
@@ -60,7 +60,16 @@ public class Vendedor {
         this.dateTimeUpdate = dateTimeUpdate;
         this.isEnabled = isEnabled;
         this.received = received;
+        this.brechos = brechos;
+
+        if (brechos != null) {
+            for (Brecho brecho : brechos) {
+                brecho.setVendedor(this);
+            }
+        }
     }
+
+
 
     // Getters and setters
 
@@ -144,7 +153,12 @@ public class Vendedor {
     public void setReceived(boolean received) {
         this.received = received;
     }
-    
 
-    
+    public List<Brecho> getBrechos() {
+        return brechos;
+    }
+
+    public void setBrechos(List<Brecho> brechos) {
+        this.brechos = brechos;
+    }
 }

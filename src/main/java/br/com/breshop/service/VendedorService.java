@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import br.com.breshop.dto.CreateBrechoDto;
+import br.com.breshop.entity.Brecho;
+import br.com.breshop.repository.BrechoRepository;
+import br.com.breshop.security.CustomAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +15,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.breshop.dto.CreateVendedorDto;
@@ -27,31 +33,29 @@ import br.com.breshop.security.jwt.JWTGenerator;
 @Service
 public class VendedorService {
 
-    @Autowired
     private final VendedorRepository vendedorRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final BrechoRepository brechoRepository;
 
-    @Autowired
-    PasswordEncoderService passwordEncoderService;
+    private CustomAuthManager authenticationManager;
 
-    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
+
     ConfirmationTokenRepository confirmationTokenRepository;
 
-    @Autowired
     private JWTGenerator jwtg;
 
-    @Autowired
     EmailService emailService;
 
-    public VendedorService(VendedorRepository vendedorRepository, AuthenticationManager authenticationManager, PasswordEncoderService passwordEncoderService, ConfirmationTokenRepository confirmationTokenRepository, JWTGenerator jwtg, EmailService emailService) {
+    @Autowired
+    public VendedorService(VendedorRepository vendedorRepository, CustomAuthManager authenticationManager, BCryptPasswordEncoder passwordEncoder, ConfirmationTokenRepository confirmationTokenRepository, JWTGenerator jwtg, EmailService emailService, BrechoRepository brechoRepository) {
         this.vendedorRepository = vendedorRepository;
         this.authenticationManager = authenticationManager;
-        this.passwordEncoderService = passwordEncoderService;
+        this.passwordEncoder = passwordEncoder;
         this.confirmationTokenRepository = confirmationTokenRepository;
         this.jwtg = jwtg;
         this.emailService = emailService;
+        this.brechoRepository = brechoRepository;
     }
 
     public Vendedor loadVendedor(CreateVendedorDto createVendedorDto) {
@@ -84,13 +88,18 @@ public class VendedorService {
         return token;
     }
 
-    public ResponseEntity<?> createVendedor(CreateVendedorDto createVendedorDto) {
+    public ResponseEntity<?> createVendedor(CreateVendedorDto createVendedorDto, CreateBrechoDto createBrechoDto) {
 
         if (createVendedorDto.senha() == null || createVendedorDto.senha().isEmpty()) {
             throw new IllegalArgumentException("Senha não pode ser nula");
         }
 
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
+        List<Brecho> brechos = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
+
+        if (brechos.contains(createBrechoDto.brechoSite())) {
+            throw new UserAlreadyExistsException("Este site já está associado a um brechó existente.");
+        }
 
         ConfirmationTokenVendedor token;
         if (vendedorOptional.isPresent()) {
@@ -101,20 +110,38 @@ public class VendedorService {
                 // Envio de e-mail
                 return sendConfirmationEmail(createVendedorDto, token);
             } else {
-                throw new UserAlreadyExistsException("Usuário já existe");
+                throw new UserAlreadyExistsException("Vendedor/Site já existe");
             }
         }
 
+        System.out.println(createBrechoDto.brechoSite());
         // Caso vendedor não exista, cria um novo
         Vendedor newVendedor = new Vendedor(
                 createVendedorDto.username(),
                 createVendedorDto.email(),
-                passwordEncoderService.encode(createVendedorDto.senha()),
+                passwordEncoder.encode(createVendedorDto.senha()),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 false,  // isEnabled
-                false   // received
+                false,   // received
+                new ArrayList<>()
         );
+        vendedorRepository.save(newVendedor);
+
+//       Cria o brecho associado aquele vendedor
+        Brecho newBrecho = new Brecho(
+                createBrechoDto.brechoNome(),
+                createBrechoDto.brechoSite(),
+                createBrechoDto.brechoEndereco(),
+                newVendedor,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+
+
+        brechoRepository.save(newBrecho);
+
+        newVendedor.getBrechos().add(newBrecho);
 
         vendedorRepository.save(newVendedor);
 
@@ -132,17 +159,11 @@ public class VendedorService {
 
 
     public void sendEmail(CreateVendedorDto createVendedorDto, ConfirmationTokenVendedor token) {
-        Vendedor newVendedor = new Vendedor(createVendedorDto.username(), createVendedorDto.email(), createVendedorDto.senha(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                false,
-                false
-        );
 
         confirmationTokenRepository.save(token);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newVendedor.getEmail());
+        mailMessage.setTo(createVendedorDto.email());
         mailMessage.setSubject("Complete seu cadastro no BreShop!");
         mailMessage.setText("Para confirmar sua conta, clique aqui : "
                 + "http://localhost:8080/api/v1/vendedores/confirmar-conta?token=" + token.getConfirmationToken());
@@ -160,23 +181,22 @@ public class VendedorService {
 
         // Verifica se o vendedor foi encontrado
         if (vendedorOptional.isEmpty()) {
-            throw new IllegalArgumentException("Credenciais inválidas");
+            throw new IllegalArgumentException("Vendedor não encontrado");
         }
 
         Vendedor vendedor = vendedorOptional.get();
 
-
         // Verifica se a senha informada corresponde à senha armazenada
-        if (!passwordEncoderService.matches(loginVendedorDto.senha(), vendedor.getSenha())) {
-            throw new IllegalArgumentException("Credenciais inválidas");
+        if (!passwordEncoder.matches(loginVendedorDto.senha(), vendedor.getSenha())) {
+            throw new IllegalArgumentException("Senha inválida");
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                vendedor.getEmail(),
-                loginVendedorDto.senha()
+            vendedor.getEmail(),
+            loginVendedorDto.senha()
         );
 
-        // Autentica o usuário
+        // Autentica o vendedor
         authenticationManager.authenticate(authentication);
 
         // Gera o token

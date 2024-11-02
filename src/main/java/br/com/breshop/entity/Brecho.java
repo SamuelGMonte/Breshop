@@ -27,14 +27,14 @@ public class Brecho {
     @Column(name = "brecho_nome")
     private String brechoNome;
 
-    @Column(name = "brecho_site")
+    @Column(unique = true, nullable = false)
     private String brechoSite;
 
     @Column(name = "brecho_endereco")
     private String brechoEndereco;
 
-    @ManyToOne 
-    @JoinColumn(name = "vendedor_id") 
+    @ManyToOne
+    @JoinColumn(name = "vendedor_id")
     private Vendedor vendedor;
 
     @CreationTimestamp
@@ -47,11 +47,11 @@ public class Brecho {
     public Brecho() {
     }
 
-    public Brecho(Integer brechoId, String brechoNome, String brechoSite, String brechoEndereco, LocalDateTime  dateTimeInsert, LocalDateTime  dateTimeUpdate) {
-        this.brechoId = brechoId;
+    public Brecho(String brechoNome, String brechoSite, String brechoEndereco, Vendedor vendedor,LocalDateTime  dateTimeInsert, LocalDateTime  dateTimeUpdate) {
         this.brechoNome = brechoNome;
         this.brechoSite = brechoSite;
         this.brechoEndereco = brechoEndereco;
+        this.vendedor = vendedor;
         this.DateTimeInsert = dateTimeInsert;
         DateTimeUpdate = dateTimeUpdate;
     }

@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro</title>
+    <title>Cadastro de Brechó</title>
     <!-- SweetAlert -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" th:href="@{css/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{../css/bootstrap/css/bootstrap.min.css}">
     <!-- CSS -->
-    <link rel="stylesheet" th:href="@{css/cadastro-brecho.css}">
+    <link rel="stylesheet" th:href="@{../css/cadastro-brecho.css}">
 </head>
 <body>
 <div class="container">
     <div class="container-cadastro">
         <h1>Não fique de fora.</h1>
-        <form id="vendedorForm" th:action="@{/cadastrar}" method="post">
+        <form id="vendedorForm" th:action="@{/vendedores/cadastrarVendedor}" method="post">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Email" required>
                 <small id="emailHelp" class="form-text text-muted">Seu e-mail não será compartilhado.</small>
             </div>
             <div class="form-group">
-                <label for="vendedorSenha">Nome da loja</label>
-                <input type="text" maxlength="30" class="form-control" id="vendedorSenha" name="senha" placeholder="Nome" required>
+                <label for="brechoNome">Nome da loja</label>
+                <input type="text" maxlength="30" class="form-control" id="brechoNome" name="brechoNome" placeholder="Nome" required>
             </div>
             <div class="form-group">
-                <label for="vendedorSenha">Endereço da loja</label>
-                <input type="text" maxlength="30" class="form-control" id="vendedorSenha" name="senha" placeholder="Endereco" required>
+                <label for="brechoEndereco">Endereço da loja</label>
+                <input type="text" maxlength="30" class="form-control" id="brechoEndereco" name="brechoEndereco" placeholder="Endereco" required>
             </div>
             <div class="form-group">
-                <label for="vendedorSenha">Site da loja</label>
-                <input type="text" maxlength="30" class="form-control" id="vendedorSenha" name="senha" placeholder="Site" required>
+                <label for="brechoSite">Site/Instagram da loja</label>
+                <input type="text" maxlength="30" class="form-control" id="brechoSite" name="brechoSite" placeholder="Site" required>
             </div>
             <div class="form-group">
                 <label for="vendedorSenha">Senha</label>
@@ -53,7 +53,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    <script th:src="@{js/cadastro-brecho/cadastro-brecho.js}"> </script>
+    <script th:src="@{../js/cadastro-brecho/cadastro-brecho.js}"> </script>
 </body>
 
 </html>

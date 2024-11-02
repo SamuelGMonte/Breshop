@@ -3,11 +3,11 @@ $(document).ready(function() {
     if (token) {
         window.location.href = '/'; 
     }
-    $('#vendedorForm').on('submit', function(event) {        
+    $('#usuarioForm').on('submit', function(event) {        
         event.preventDefault();
 
-        const password = $('#vendedorSenha').val();
-        const confirmPassword = $('#vendedorConfirmaSenha').val();
+        const password = $('#usuarioSenha').val();
+        const confirmPassword = $('#usuarioConfirmaSenha').val();
 
         if(password !== confirmPassword) {
             Swal.fire({
@@ -27,7 +27,7 @@ $(document).ready(function() {
             data: formData,
             success: function(successMessage) {
                 Swal.fire({
-                    iconHtml: '<img src="./assets/mail-logo.png" style="height: 50px;">',
+                    iconHtml: '<img src="../assets/mail-logo.png" style="height: 50px;">',
                     title: 'Sucesso!',
                     text: successMessage,
                     confirmButtonText: 'OK'
@@ -47,7 +47,7 @@ $(document).ready(function() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
-                        text: 'Ocorreu um erro ao cadastrar o vendedor.',
+                        text: 'Ocorreu um erro ao cadastrar o usuario.',
                         confirmButtonText: 'OK'
                     });
                 }

@@ -7,23 +7,23 @@
     <!-- SweetAlert -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" th:href="@{css/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{../css/bootstrap/css/bootstrap.min.css}">
     <!-- CSS -->
-    <link rel="stylesheet" th:href="@{css/login.css}">
+    <link rel="stylesheet" th:href="@{../css/login-usuario.css}">
 </head>
 <body>
 <div class="container">
     <div class="container-login">
         <h1>Não fique de fora.</h1>
-        <form id="vendedorLoginForm" th:action="@{/logar}" method="post">
+        <form id="usuarioLoginForm" th:action="@{/usuarios/logarUsuario}" method="post">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" required>
                 <small id="emailHelp" class="form-text text-muted">Seu e-mail não será compartilhado.</small>
             </div>
             <div class="form-group">
-                <label for="vendedorSenha">Senha</label>
-                <input type="password" class="form-control" id="vendedorSenha" name="senha" placeholder="Senha" required>
+                <label for="usuarioSenha">Senha</label>
+                <input type="password" class="form-control" id="usuarioSenha" name="senha" placeholder="Senha" required>
             </div>
             <div class="btn-container d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary">Login</button>
@@ -37,8 +37,8 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    <script type="module" defer th:src="@{js/auth/auth.js}"></script>
-    <script type="module" th:src="@{js/login/login.js}"> </script>
+    <script type="module" defer th:src="@{../js/auth/auth.js}"></script>
+    <script type="module" th:src="@{../js/login-usuario/login-usuario.js}"> </script>
 </body>
 
 </html>

@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import br.com.breshop.dto.CreateUsuarioDto;
-import br.com.breshop.dto.CreateVendedorDto;
-import br.com.breshop.dto.LoginVendedorDto;
+import br.com.breshop.dto.LoginUserDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
+import br.com.breshop.entity.Usuario;
 import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.security.jwt.JWTGenerator;
 import br.com.breshop.service.UsuarioDetailsService;
@@ -75,13 +75,34 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginVendedorDto LoginVendedorDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(LoginVendedorDto.email(), LoginVendedorDto.senha()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginUserDto loginUserDto) {
+        Map<String, String> response = new HashMap<>();
 
-        String token = jwtGenerator.generateToken(authentication);
-        return ResponseEntity.ok(new AuthResponseDTO("success", token));
+        if (loginUserDto.senha() == null || loginUserDto.senha().isEmpty()) {
+            response.put("status", "error");
+            response.put("message", "Senha vazia.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            Usuario usuario = usuarioService.findByEmail(loginUserDto.email());
+
+            if (!usuario.getIsEnabled()) {
+                response.put("status", "error");
+                response.put("message", "Usuário não está com email verificado.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            AuthResponseDTO authResponse = usuarioService.loginUsuario(loginUserDto);
+            response.put("status", "success");
+            response.put("message", "Usuário logado com sucesso" );
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @GetMapping("/confirmar-conta")
