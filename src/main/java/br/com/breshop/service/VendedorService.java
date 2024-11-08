@@ -2,33 +2,37 @@ package br.com.breshop.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-import br.com.breshop.dto.CreateBrechoDto;
-import br.com.breshop.entity.Brecho;
-import br.com.breshop.repository.BrechoRepository;
-import br.com.breshop.repository.UsuarioRepository;
-import br.com.breshop.security.CustomAuthManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.breshop.dto.CreateBrechoDto;
 import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
+import br.com.breshop.entity.Brecho;
 import br.com.breshop.entity.ConfirmationTokenVendedor;
 import br.com.breshop.entity.Vendedor;
-import br.com.breshop.exception.UserAlreadyReceivedException;
 import br.com.breshop.exception.UserAlreadyExistsException;
+import br.com.breshop.exception.UserAlreadyReceivedException;
+import br.com.breshop.repository.BrechoRepository;
 import br.com.breshop.repository.ConfirmationTokenRepository;
+import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.repository.VendedorRepository;
+import br.com.breshop.security.CustomAuthManager;
 import br.com.breshop.security.jwt.JWTGenerator;
 
 @Service
@@ -103,9 +107,9 @@ public class VendedorService {
         }
 
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
-        List<Brecho> brechos = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
+        Optional<Brecho> brechos = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
 
-        if (brechos.contains(createBrechoDto.brechoSite())) {
+        if (brechos.equals(createBrechoDto.brechoSite())) {
             throw new UserAlreadyExistsException("Este site já está associado a um brechó existente.");
         }
 

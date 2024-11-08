@@ -24,14 +24,6 @@
                 <div class="login center-text">Vendedor</div>
                 <span class="center-text">Login como</span>
             </a>
-
-            <!-- <a class="btn-mobile" href="/usuarios/login" style="display: none;"> -->
-                <!-- <div class="login-user center-text">Usuário</div>
-                <span class="center-text" >Login</span>
-            </a>
-            <a class="btn-mobile" href="/vendedores/login" style="display: none;">
-                <div class="login-vendedor center-text">Vendedor</div>
-                <span class="center-text">Login</span> -->
             </a>
         </div>
         <div class="container mx-auto d-flex justify-content-center align-items-center">
@@ -49,14 +41,12 @@
                 <h1 style="text-align: center;"><b>Conosco, você terá a melhor experiência de brechós online.<b></h1>
             </div>
             <div class="cadastro-container">
-                <div class="cadastro cadastro-usuario" style="text-align: center;">
-                    <a href="usuarios/cadastro"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre-se</button></a>
-                </div>
+                
                 <div class="cadastro cadastro-brecho" style="text-align: center;">
                     <a href="vendedores/cadastro-brecho"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre seu brechó</button></a>
                 </div>
             </div>
-            <div class="logos-slider">
+            <!-- <div class="logos-slider">
                 <div class="logos-wrapper">
                     <div class="logo-item">
                         <img th:src="@{assets/havaianas-logo.png}" alt="" src="">
@@ -89,10 +79,31 @@
                         <img th:src="@{assets/farm-logo.png}" alt="" src="">
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
-
+    
+    <div class="container-cadastro">
+        <h1>Não fique de fora.</h1>
+        <form id="usuarioForm" th:action="@{/usuarios/cadastrarUsuario}" method="post">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" required>
+                <small id="emailHelp" class="form-text text-muted">Seu e-mail não será compartilhado.</small>
+            </div>
+            <div class="form-group">
+                <label for="usuarioSenha">Senha</label>
+                <input type="password" maxlength="30" class="form-control" id="usuarioSenha" name="senha" placeholder="Senha" required>
+            </div>
+            <div class="form-group">
+                <label for="usuarioConfirmaSenha">Senha novamente</label>
+                <input type="password" maxlength="30" class="form-control" id="usuarioConfirmaSenha" name="confirmaSenha" placeholder="Senha" required>
+            </div>
+            <div class="btn-container d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </div>
+        </form>
+    </div>
     <!-- JQuery -->
     <script th:src="@{js/jquery/jquery-3.7.1.min.js}"></script>
     <!-- Bootstrap JS -->

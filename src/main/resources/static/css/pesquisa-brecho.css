@@ -18,21 +18,10 @@ body {
     font-family: 'Poppins';
 }
 
-.container-cadastro {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 90%;
-    height: 100vh;
-}
 
-
-.container-cadastro > h1 {
+.container-pesquisa > h1 {
     font-size: 3rem;
     color: black;
     text-align: center;
 }
 
-.container-cadastro > form {
-
-}

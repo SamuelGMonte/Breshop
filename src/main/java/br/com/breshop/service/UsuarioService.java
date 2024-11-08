@@ -169,7 +169,7 @@ public class UsuarioService{
             throw new IllegalArgumentException("Usuário não encontrado");
         }
 
-        if(usuarioRepository.findByEmail(loginUsuarioDto.email()).isPresent()) {
+        if(vendedorRepository.findByEmail(loginUsuarioDto.email()).isPresent()) {
             throw new IllegalArgumentException("Faça login como vendedor.");
         }
 

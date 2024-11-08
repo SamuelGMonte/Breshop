@@ -34,16 +34,32 @@ body {
 }
 
 .hero > a.button.btn-logout > img {
-    width: 25px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
     border-radius: 50px;
-    float: right;
+    transition: left 0.35s;
 }
 
-.btn-login, .btn-logout {
+.btn-logout {
     text-decoration: none;
-    width: 200px;
     display: block; 
-    transition: height .35s, background-color .35s, transform .35s; 
+    transition: width .35s, background-color .35s, transform .35s; 
+    position: relative; 
+    overflow: hidden;
+    color: white;
+    background-color: white;
+    border-radius: 5px;
+    height: 15px;
+    width: 50px;
+}
+
+.btn-login {
+    text-decoration: none;
+    width: 200px; 
+    display: block; 
+    transition: width .35s, background-color .35s, transform .35s; 
     position: relative; 
     overflow: hidden;
 }
@@ -53,34 +69,33 @@ body {
     background-color: rgba(0, 0, 0, 0);
 }
 
-.btn-logout {
-    color: white;
-    background-color: white;
-    border-radius: 5px;
-}
-
 .login, .logout {
-    font-size: .8em;
+    font-size: 1em;
     position: absolute; 
     left: 10px;
-    top: 50%;
+    top: 70%;
     transform: translateY(-50%); 
     opacity: 0;
     transition: opacity .45s; 
 }
 
-.dropdown-text {
-    font-size: 0.7em; 
-    position: absolute;
-    left: 10px; 
-    top: 100%;
-    opacity: 0; 
+.logout {
+    font-size: 1em;
+    position: absolute; 
+    left: 10px;
+    top: 14px;
+    transform: translateY(-50%); 
+    opacity: 0;
     transition: opacity .45s; 
+}
+
+div.hero > a {
+    height: 30px !important;
 }
 
 .anchor_dropdown {
     display: block; 
-    height: 50px; 
+    height: 80px; 
     overflow: hidden; 
 }
 
@@ -91,14 +106,17 @@ body {
 }
 
 .anchor_dropdown:hover {
-    height: 100px;
+    width: 60px;
     background-color: rgb(255, 255, 255);
     transform: scale(1); 
 }
 
+.hero > a.button.btn-logout:hover > img {
+    left: 50px;
+    transform: translateX(-50%);
+}
 .anchor_dropdown:hover .login, a:hover .logout {
     opacity: 1;
-    top: 60%;
 }
 
 .login-container {
@@ -173,7 +191,35 @@ body {
     margin-top: 150px;
 }
 
+.container-cadastro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    width: 100%; 
+    height: 100vh;
+    padding: 20px;
+}
+
+.form-group input {
+    padding: 12px 20px;  
+    font-size: 16px;  
+    height: 45px;
+    width: 100%;  
+    max-width: 500px;
+    margin-bottom: 15px;
+}
+
+.container-cadastro > h1 {
+    font-size: 3rem;
+    color: black;
+    text-align: center;
+}
+
 /* MEDIAS */
+
+
+
 
 
 @media (max-width: 800px) {

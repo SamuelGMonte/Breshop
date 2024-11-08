@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa por nome</title>
+    <!-- SweetAlert -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{../css/bootstrap/css/bootstrap.min.css}">
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{../css/pesquisa-brecho.css}">
+    <!-- DataTable CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+    <!-- DataTable JS -->
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="container-pesquisa">
+    <h1>Procura por brechó</h1>
+    <table id="brecho_tbl" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Endereço</th>
+                <th>Site</th>
+            </tr>
+        </thead>
+    </table>
+  </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<script type="module" defer th:src="@{../js/auth/auth.js}"></script>
+<script type="module" th:src="@{../js/pesquisa-brecho/pesquisa-brecho.js}"> </script>
+</body>
+
+</html>
