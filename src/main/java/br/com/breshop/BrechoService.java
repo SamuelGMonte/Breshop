@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.breshop.entity.Brecho;
 import br.com.breshop.repository.BrechoRepository;
 
 @Service
@@ -16,6 +17,10 @@ public class BrechoService {
     @Autowired
     BrechoService(BrechoRepository brechoRepository) {
         this.brechoRepository = brechoRepository;
+    }
+
+    public List<Brecho> getBrechosByVendedorId(Integer vendedorId) {
+        return brechoRepository.findByVendedorId(vendedorId);
     }
 
     public List<String> getAllBrechosNomes() {

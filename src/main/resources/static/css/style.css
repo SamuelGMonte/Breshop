@@ -185,6 +185,10 @@ div.hero > a {
     }
 }
 
+.procura-brecho {
+    margin-top: 30px;
+}
+
 /* Formulario css */
 
 .container > .container-form  {
@@ -199,6 +203,11 @@ div.hero > a {
     width: 100%; 
     height: 100vh;
     padding: 20px;
+}
+
+#usuarioForm {
+    width: 100%; 
+    max-width: 500px;
 }
 
 .form-group input {
