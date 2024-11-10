@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -251,7 +252,11 @@ public class VendedorService {
         vendedor.setIsEnabled(true);
         vendedorRepository.save(vendedor);
 
+        //Deleta o token após verificado
+        confirmationTokenRepository.delete(confirmationTokenVendedor);
+
         response.put("success", "Email verificado com sucesso!");
+
         return ResponseEntity.ok(response);
     }
 

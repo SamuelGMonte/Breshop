@@ -42,61 +42,9 @@ body {
     transition: left 0.35s;
 }
 
-.btn-logout {
-    text-decoration: none;
-    display: block; 
-    transition: width .35s, background-color .35s, transform .35s; 
-    position: relative; 
-    overflow: hidden;
-    color: white;
-    background-color: white;
-    border-radius: 5px;
-    height: 15px;
-    width: 50px;
-}
-
-.btn-login {
-    text-decoration: none;
-    width: 200px; 
-    display: block; 
-    transition: width .35s, background-color .35s, transform .35s; 
-    position: relative; 
-    overflow: hidden;
-}
-
-.btn-login {
-    color: black;
-    background-color: rgba(0, 0, 0, 0);
-}
-
-.login, .logout {
-    font-size: 1em;
-    position: absolute; 
-    left: 10px;
-    top: 70%;
-    transform: translateY(-50%); 
-    opacity: 0;
-    transition: opacity .45s; 
-}
-
-.logout {
-    font-size: 1em;
-    position: absolute; 
-    left: 10px;
-    top: 14px;
-    transform: translateY(-50%); 
-    opacity: 0;
-    transition: opacity .45s; 
-}
 
 div.hero > a {
     height: 30px !important;
-}
-
-.anchor_dropdown {
-    display: block; 
-    height: 80px; 
-    overflow: hidden; 
 }
 
 .center-text {
@@ -115,15 +63,6 @@ div.hero > a {
     left: 50px;
     transform: translateX(-50%);
 }
-.anchor_dropdown:hover .login, a:hover .logout {
-    opacity: 1;
-}
-
-.login-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: right;
-}
 
 
 .hero > .container > .text > h1 {
@@ -132,6 +71,66 @@ div.hero > a {
     mix-blend-mode: difference;
 }
 
+.login-dropdown {
+    position: absolute;
+    right: 20px;
+    top: 60px;
+    z-index: 1000;
+    min-width: 250px;
+}
+
+.login-option {
+    display: block;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: white;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+.login-option:hover {
+    background-color: #f8f9fa;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.login-option span {
+    display: block;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.login-option div {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.login-trigger {
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background: white;
+}
+
+.login-container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-arrow {
+    display: inline-block;
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.open {
+    transform: rotate(180deg);
+}
 
 .container {
     width: 90%;
@@ -262,16 +261,8 @@ div.hero > a {
    
 }
 
-@media (min-width: 1200px) {
-    .btn-cadastro {
-        width: 250px;
-    }
-}
 
-.btn-cadastro {
-    font-size: large !important;
-}
 
 .cadastro {
-    margin-top: 10px
+    margin-top: 10px;
 }

@@ -23,10 +23,16 @@ $(document).ready(function() {
                 columns: [
                     { "data": "nome" },        
                     { "data": "endereco" },     
-                    { "data": "site" }     
+                    { 
+                        "data": "site",
+                        "render": function(data, type, row) {
+                            const url = data.startsWith("http://") || data.startsWith("https://") ? data : `http://${data}`;
+                            return `<a href="${url}" target="_blank">${data}</a>`;
+                        }
+                    }
                 ],
                 language: {
-                    url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/pt-BR.json',
+                    url: './assets/pt-BR.json',
                 },
             });
         } else {

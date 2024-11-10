@@ -1,8 +1,8 @@
 $(document).ready(function() {
     $.when(
-        $.ajax({ url: "/api/v1/brecho/nomes" }),   
-        $.ajax({ url: "/api/v1/brecho/enderecos" }) ,
-        $.ajax({ url: "/api/v1/brecho/sites" }) 
+        $.ajax({ url: "/api/v1/brecho/nomes", type: "GET"}),   
+        $.ajax({ url: "/api/v1/brecho/enderecos", type: "GET" }) ,
+        $.ajax({ url: "/api/v1/brecho/sites", type: "GET" }) 
     ).then(function(nomesResponse, enderecosResponse, siteResponse) {
         
         if (nomesResponse[0].status === "success" && enderecosResponse[0].status === "success" && siteResponse[0].status == "success") {
@@ -26,7 +26,7 @@ $(document).ready(function() {
                     { "data": "site" }     
                 ],
                 language: {
-                    url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/pt-BR.json',
+                    url: './assets/pt-BR.json',
                 },
             });
         } else {

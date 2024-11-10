@@ -1,3 +1,4 @@
+var isOnlineFlag = false;
 $(document).ready(function() {
     const token = localStorage.getItem('jwtToken');
     if (token) {
@@ -19,8 +20,10 @@ $(document).ready(function() {
             return;
         }
 
-        const formData = $(this).serialize();
-
+        const endereco = $("#brechoEndereco").val();
+        
+        const formData = $(this).serialize() + "&endereco=" + (isOnlineFlag ? "Online" : endereco);
+        
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',
@@ -55,6 +58,22 @@ $(document).ready(function() {
         });
     });
 });
+
+
+function toggleAddress() {
+    const addressInput = $("#brechoEndereco");
+    const isOnlineOnly = $("#checkOnline").is(":checked");
+
+    isOnlineFlag = isOnlineOnly;
+
+    if (isOnlineOnly) {
+        addressInput.val("Online");
+    } else {
+        addressInput.val("");
+    }
+}
+
+
 
 function isJSON(str) {
     try {
