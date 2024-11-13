@@ -5,28 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
 import br.com.breshop.dto.CreateBrechoDto;
+import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
-import br.com.breshop.entity.Usuario;
-import br.com.breshop.security.jwt.JWTGenerator;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.exception.UserAlreadyExistsException;
 import br.com.breshop.service.VendedorService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/vendedores")
@@ -63,10 +54,11 @@ public class VendedorController {
 
     }
 
-    @PostMapping("/registrar")
+    @PostMapping(value = "/registrar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> cadastrarVendedor(
-            @RequestBody CreateVendedorDto createVendedorDto,
-            @RequestBody CreateBrechoDto createBrechoDto,
+            @RequestPart("vendedor") CreateVendedorDto createVendedorDto,
+            @RequestPart("brecho") CreateBrechoDto createBrechoDto,
+            @RequestPart("file") MultipartFile file,
             BindingResult result) {
 
         Map<String, String> response = new HashMap<>();
@@ -78,7 +70,7 @@ public class VendedorController {
         }
 
         try {
-            ResponseEntity<?> emailValidated = vendedorService.createVendedor(createVendedorDto, createBrechoDto);
+            ResponseEntity<?> emailValidated = vendedorService.createVendedor(createVendedorDto, createBrechoDto, file);
             if (emailValidated.getStatusCode() == HttpStatus.OK) {
                 response.put("status", "success");
                 response.put("message", "Verifique o email pelo link enviado ao seu endereço de email");

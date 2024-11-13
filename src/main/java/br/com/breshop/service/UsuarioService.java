@@ -93,7 +93,7 @@ public class UsuarioService{
             throw new IllegalArgumentException("Senha não pode ser nula");
         }
 
-        if(vendedorRepository.findByEmail(createUsuarioDto.email()).isPresent()) {
+        if(!vendedorRepository.findByEmail(createUsuarioDto.email()).isEmpty()) {
             throw new IllegalArgumentException("Usuário já esta cadastrado como vendedor");
         }
 
@@ -169,7 +169,7 @@ public class UsuarioService{
             throw new IllegalArgumentException("Usuário não encontrado");
         }
 
-        if(vendedorRepository.findByEmail(loginUsuarioDto.email()).isPresent()) {
+        if(!vendedorRepository.findByEmail(loginUsuarioDto.email()).isEmpty()) {
             throw new IllegalArgumentException("Faça login como vendedor.");
         }
 

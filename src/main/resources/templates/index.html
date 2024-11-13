@@ -10,41 +10,40 @@
     <link rel="stylesheet" th:href="@{css/style.css}">
 </head>
 <body>
-    <div class="hero">
-        <a class="button btn-logout anchor_dropdown" style="display: none;">
-            <img th:src="@{assets/quit-icon.webp}" alt="">
-            <div class="logout">Sair</div>
-        </a>
 
-
-        <nav class="navbar navbar-light bg-light">
-            <div class="container">
-                <a class="navbar-brand">Logo</a>
-                <div class="login-container">
-                    <button class="login-trigger" type="button" data-toggle="collapse" data-target="#loginOptions" aria-expanded="false">
-                        Login <span class="dropdown-arrow">▾</span>
-                    </button>
-                    
-                    <div class="collapse login-dropdown shadow" id="loginOptions">
-                        <a href="#" class="login-option">
-                            <span>Login para</span>
-                            <div>Candidatos</div>
-                        </a>
-                        <a href="#" class="login-option">
-                            <span>Login para</span>
-                            <div>Empresas</div>
-                        </a>
-                    </div>
+    <nav class="navbar navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand">BreShop</a>
+            <div class="login-container">
+                <button class="logout-trigger"  style="display: none;">
+                    <img id="img-logout" th:src="@{assets/quit-icon.webp}" alt="">
+                    <div class="logout">Sair</div>
+                </button>
+                <button class="login-trigger" type="button" data-toggle="collapse" data-target="#loginOptions" aria-expanded="false">
+                    Login <span class="dropdown-arrow">▾</span>
+                </button>
+                
+                <div class="collapse login-dropdown shadow" id="loginOptions">
+                    <a href="usuarios/login" class="login-option">
+                        <span>Login para</span>
+                        <div>Usuários</div>
+                    </a>
+                    <a href="/vendedores/login" class="login-option">
+                        <span>Login para</span>
+                        <div>Vendedores</div>
+                    </a>
                 </div>
             </div>
-        </nav>
-        
-        
+        </div>
+    </nav>
 
+    
+    <div class="hero">
+        
 
         <div class="container mx-auto d-flex justify-content-center align-items-center">
             <div class="text">
-                <h1><b>Olhe, <br>Compare, <br>Compre.</b> </h1>
+                <h1><b>Olhe, <br>Compare, <br><span class="underline-animation">Compre.</span></h1>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, rem possimus! Eius ducimus harum veritatis possimus optio aperiam impedit cupiditate. Nulla maiores reprehenderit libero! Suscipit ad distinctio voluptates rem? Non.
                     Fuga tempore impedit, alias non nesmo rerum possimus</p>
                 </div>
@@ -61,45 +60,11 @@
                 <h1 style="text-align: center;"><b>Conosco, você terá a melhor experiência de brechós online.<b></h1>
             </div>
                 <div class="cadastro-brecho" style="text-align: center;">
-                    <a href="vendedores/cadastro-brecho"><button type="button" class="btn btn-lg btn-primary btn-cadastro">Cadastre seu brechó</button></a>
+                    <a href="vendedores/cadastro-brecho"><button type="button" class="btn-cadastro">Cadastre seu brechó</button></a>
                 </div>
                 <div class="procura-brecho" style="text-align: center;">
-                    <a href="/pesquisa-brecho"><button type="button" class="btn btn-lg btn-primary btn-procura">Procure brechós cadastrados</button></a>
+                    <a id="anchor-procura" href="/pesquisa-brecho"><button type="button" class="btn-procura">Procure brechós cadastrados</button></a>
                 </div>
-            <!-- <div class="logos-slider">
-                <div class="logos-wrapper">
-                    <div class="logo-item">
-                        <img th:src="@{assets/havaianas-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/natura-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/zara-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/wepink-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/farm-logo.png}" alt="" src="">
-                    </div>
-                      <div class="logo-item">
-                        <img th:src="@{assets/havaianas-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/natura-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/zara-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/wepink-logo.png}" alt="" src="">
-                    </div>
-                    <div class="logo-item">
-                        <img th:src="@{assets/farm-logo.png}" alt="" src="">
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
     

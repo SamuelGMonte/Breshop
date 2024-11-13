@@ -12,8 +12,9 @@ import br.com.breshop.entity.Brecho;
 
 @Repository
 public interface BrechoRepository extends JpaRepository<Brecho, Integer> {
-    Optional<Brecho> findByBrechoSite(String brechoSite);
-    Optional<Brecho> findByBrechoNome(String brechoNome);
+    List<Brecho> findByBrechoSite(String brechoSite);
+    List<Brecho> findByBrechoNome(String brechoNome);
+
     Optional<Brecho> findByBrechoEndereco(String brechoEndereco);
 
     @Query("SELECT b FROM Brecho b WHERE b.vendedor.vendedorId = :vendedorId")
@@ -26,5 +27,5 @@ public interface BrechoRepository extends JpaRepository<Brecho, Integer> {
     List<String> findAllByBrechoEndereco(); 
 
     @Query("SELECT b.brechoSite FROM Brecho b")
-    List<String> findAllByBrechoSite(); 
+    List<String> findAllByBrechoSite();
 }

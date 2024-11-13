@@ -21,11 +21,40 @@ body {
 .hero {
     position: relative;
     width: 100%;
-    height: 100vh;
+    height: 150vh;
     min-height: 600px;
     background: url('/assets/hanger.jpg') no-repeat center / contain;
     background-position: top;
 }
+
+.underline-animation {
+    display: inline-block;
+    position: relative;
+}
+
+.underline-animation:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 4px;
+    bottom: -5px;
+    left: 0;
+    background-color: #0087ca;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.underline-animation.active:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.underline-animation b {
+    display: inline-block;
+    margin-top: -0.5em;
+}
+
 
 .hero > a.button.btn-login > img {
     width: 25px;
@@ -33,15 +62,9 @@ body {
     float: left;
 }
 
-.hero > a.button.btn-logout > img {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    border-radius: 50px;
-    transition: left 0.35s;
+#img-logout {
+    height: 30px;
 }
-
 
 div.hero > a {
     height: 30px !important;
@@ -53,11 +76,6 @@ div.hero > a {
     transform: translateX(-50%);
 }
 
-.anchor_dropdown:hover {
-    width: 60px;
-    background-color: rgb(255, 255, 255);
-    transform: scale(1); 
-}
 
 .hero > a.button.btn-logout:hover > img {
     left: 50px;
@@ -67,8 +85,7 @@ div.hero > a {
 
 .hero > .container > .text > h1 {
     font-size: 5rem;
-    color: white; 
-    mix-blend-mode: difference;
+    color: black; 
 }
 
 .login-dropdown {
@@ -112,6 +129,16 @@ div.hero > a {
 .login-trigger {
     cursor: pointer;
     padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    background: white;
+}
+
+.logout-trigger {
+    display: flex;
+    align-items: flex-end;
+    cursor: pointer;
+    padding: 2px 16px;
     border-radius: 4px;
     border: 1px solid #dee2e6;
     background: white;
@@ -184,7 +211,44 @@ div.hero > a {
     }
 }
 
-.procura-brecho {
+#anchor-procura {
+    color: black;
+}
+
+
+.btn-procura, .btn-cadastro {
+    all: unset;
+}
+
+.btn-procura, .btn-cadastro {
+    display: inline-block;
+    position: relative;
+    font-size: 2rem;
+    color: black;
+}
+
+
+
+.btn-procura:after, .btn-cadastro:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 4px;
+    bottom: -5px;
+    left: 0;
+    background-color: #ef6305;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+
+.btn-procura:hover:after, .btn-cadastro:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+.procura-brecho, .cadastro-brecho {
     margin-top: 30px;
 }
 
@@ -193,6 +257,7 @@ div.hero > a {
 .container > .container-form  {
     margin-top: 150px;
 }
+
 
 .container-cadastro {
     display: flex;
@@ -227,12 +292,9 @@ div.hero > a {
 /* MEDIAS */
 
 
-
-
-
 @media (max-width: 800px) {
     .hero {
-        height: auto;
+        height: 120vh;
     }
 
     .container > .text > h1 {
@@ -240,12 +302,16 @@ div.hero > a {
     }
 }
 
+
 @media (max-width: 500px) {
     html {
         overflow-x: hidden;
     }
-    .container {
-        margin-top: 50px;
+    .text {
+        margin-top: 100px;
+    }
+    .btn-procura, .btn-cadastro {
+        font-size: 1.5rem;
     }
     .container > .text > h1 {
         font-size: 3rem !important;
@@ -262,6 +328,13 @@ div.hero > a {
 }
 
 
+footer {
+    margin-top: 10vh;
+}
+
+body > b > b > b > footer > div > p {
+    margin: 0;
+}
 
 .cadastro {
     margin-top: 10px;

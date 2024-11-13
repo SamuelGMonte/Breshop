@@ -13,17 +13,17 @@ $(document).ajaxSend(function(e, xhr, options) {
     }
 });
 
-// Handle unauthorized responses (401 errors)
-$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
-    if (jqXHR.status === 401 && !isLoggedOut) {
-        isLoggedOut = true;
-        console.log("Token expirado");
+// // Handle unauthorized responses (401 errors)
+// $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
+//     if (jqXHR.status === 401 && !isLoggedOut) {
+//         isLoggedOut = true;
+//         console.log("Token expirado");
 
-        localStorage.removeItem('jwtToken');
-        window.location.href = LOGIN_PAGE_URL;  // Redirect to login page
+//         localStorage.removeItem('jwtToken');
+//         window.location.href = LOGIN_PAGE_URL;  // Redirect to login page
 
-        alert("Sessão expirada ou você foi deslogado por inatividade. Logue novamente.");
+//         alert("Sessão expirada ou você foi deslogado por inatividade. Logue novamente.");
         
-    }
-});
+//     }
+// });
 

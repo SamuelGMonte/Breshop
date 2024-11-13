@@ -1,27 +1,42 @@
 package br.com.breshop.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import br.com.breshop.entity.Vendedor;
+import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.repository.VendedorRepository;
+import br.com.breshop.service.VendedorService;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 
 import br.com.breshop.BrechoService;
 import br.com.breshop.entity.Brecho;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
 @RequestMapping("/api/v1/brecho")
 public class BrechoController {
     private final BrechoService brechoService;
+    private final VendedorRepository vendedorRepository;
 
-    public BrechoController(BrechoService brechoService) {
+    @Value("${nsfw.key}")
+    private String nsfwKey;
+
+    public BrechoController(BrechoService brechoService, VendedorRepository vendedorRepository) {
         this.brechoService = brechoService;
+        this.vendedorRepository = vendedorRepository;
+
     }
 
     @GetMapping("/{vendedorId}/meus-brechos")
@@ -93,5 +108,69 @@ public class BrechoController {
         response.put("message", "Nenhum endereço encontrado");
         return ResponseEntity.badRequest().body(response);
     }
-    
+
+    @GetMapping("/imagens/{vendedorId}")
+    public ResponseEntity<?> getBrechosImageByVendedorId(@PathVariable Integer vendedorId) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<Vendedor> vendedorOptional = vendedorRepository.findById(vendedorId);
+
+        if (vendedorOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vendedor não encontrado");
+        }
+
+        Vendedor vendedor = vendedorOptional.get();
+        List<Brecho> brechos = brechoService.getBrechosByVendedorId(vendedorId);
+        byte[] imagemBrecho = brechoService.getBrechoImg(vendedor);
+
+        if (!brechos.isEmpty()) {
+            List<String> brechoNames = brechos.stream()
+                    .map(Brecho::getBrechoNome)
+                    .collect(Collectors.toList());
+
+            response.put("status", "success");
+            response.put("imagem", imagemBrecho);
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("status", "error");
+        response.put("message", "Nenhuma imagem do brechó encontrada");
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping("/imagens")
+    public ResponseEntity<?> getAllBrechosImage() {
+        Map<String, Object> response = new HashMap<>();
+        List<String> enderecos = brechoService.getAllBrechoSites();
+        List<byte[]> brechosImages = brechoService.getAllBrechoImgs();
+
+        response.put("status", "success");
+
+        if (!enderecos.isEmpty()) {
+            response.put("websites", enderecos);
+        }
+
+        if (!brechosImages.isEmpty()) {
+            List<Map<String, Object>> brechosInfo = new ArrayList<>();
+
+            for (byte[] image : brechosImages) {
+                Map<String, Object> brechoInfo = new HashMap<>();
+                brechoInfo.put("imagem", Base64.getEncoder().encodeToString(image));
+                brechosInfo.add(brechoInfo);
+            }
+
+            response.put("brechos", brechosInfo);
+        } else {
+            response.put("status", "error");
+            response.put("message", "Nenhuma imagem encontrada");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
+
 }

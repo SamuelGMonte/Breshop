@@ -2,13 +2,13 @@ $(document).ready(function() {
     const token = localStorage.getItem('jwtToken');
     if (token) {
         $('.btn-cadastro').hide();
-        $('.btn-login').hide();
-        $('.btn-logout').show();
+        $('.login-trigger').hide();
+        $('.logout-trigger').show();
         $('.container-cadastro').hide();
     } else {
         $('.btn-cadastro').show();
-        $('.btn-login').show();
-        $('.btn-logout').hide();
+        $('.login-trigger').show();
+        $('.logout-trigger').hide();
         $('.container-cadastro').show();
     }
 
@@ -64,10 +64,10 @@ $(document).ready(function() {
         });
     });
 
-    $('.btn-logout').on('click', function() {
+    $('.logout-trigger').on('click', function() {
         localStorage.removeItem('jwtToken'); 
         $('.btn-cadastro').show(); 
-        $('.btn-logout').hide();
+        $('.logout-trigger').hide();
         Swal.fire({
             icon: 'success',
             title: 'Desconectado',
@@ -86,3 +86,21 @@ function isJSON(str) {
         return false;
     }
 }
+
+
+document.querySelector('.login-trigger').addEventListener('click', function() {
+    document.querySelector('.dropdown-arrow').classList.toggle('open');
+});
+
+document.addEventListener('click', function(event) {
+    const loginContainer = document.querySelector('.login-container');
+    const loginOptions = document.querySelector('#loginOptions');
+    if (!loginContainer.contains(event.target)) {
+        loginOptions.classList.remove('show');
+        document.querySelector('.dropdown-arrow').classList.remove('open');
+    }
+});
+
+window.addEventListener('load', function() {
+    document.querySelector('.underline-animation').classList.add('active');
+});

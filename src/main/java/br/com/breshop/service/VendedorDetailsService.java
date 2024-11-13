@@ -1,6 +1,7 @@
 package br.com.breshop.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,15 @@ public class VendedorDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<Vendedor> vendedor = vendedorRepository.findByEmail(email);
-        if (vendedor.isPresent()) {
+        List<Vendedor> vendedores = vendedorRepository.findByEmail(email);
+        if (!vendedores.isEmpty()) {
+            Vendedor vendedor = vendedores.get(0);  // Usa o primeiro vendedor encontrado
             return new org.springframework.security.core.userdetails.User(
-                    vendedor.get().getEmail(),
-                    vendedor.get().getSenha(),
+                    vendedor.getEmail(),
+                    vendedor.getSenha(),
                     new ArrayList<>()
             );
-        } else {
+        }  else {
             throw new UsernameNotFoundException("Vendedor não encontrado com email: " + email);
         }
     }

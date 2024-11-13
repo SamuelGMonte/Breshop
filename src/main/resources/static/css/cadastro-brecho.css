@@ -18,13 +18,10 @@ body {
     font-family: 'Poppins';
 }
 
-.container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
 
+.logo-txt {
+    font-size: 1.2em;
+}
 
 .container-cadastro-brecho > h1 {
     font-size: 3rem;

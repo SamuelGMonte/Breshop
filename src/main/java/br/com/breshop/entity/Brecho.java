@@ -1,20 +1,16 @@
 package br.com.breshop.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tbl_brecho")
@@ -42,20 +38,23 @@ public class Brecho {
     private LocalDateTime DateTimeInsert;
 
     @UpdateTimestamp
-    private LocalDateTime  DateTimeUpdate;
+    private LocalDateTime DateTimeUpdate;
+
+    @OneToOne(mappedBy = "brechoImg", cascade = CascadeType.ALL)
+    private VendedorImages vendedorImagesList;
 
     public Brecho() {
     }
 
-    public Brecho(String brechoNome, String brechoSite, String brechoEndereco, Vendedor vendedor,LocalDateTime  dateTimeInsert, LocalDateTime  dateTimeUpdate) {
+    public Brecho(String brechoNome, String brechoSite, String brechoEndereco, Vendedor vendedor, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, VendedorImages vendedorImagesList) {
         this.brechoNome = brechoNome;
         this.brechoSite = brechoSite;
         this.brechoEndereco = brechoEndereco;
         this.vendedor = vendedor;
         this.DateTimeInsert = dateTimeInsert;
-        DateTimeUpdate = dateTimeUpdate;
+        this.DateTimeUpdate = dateTimeUpdate;
+        this.vendedorImagesList = vendedorImagesList;
     }
-
 
     public Integer getBrechoId() {
         return this.brechoId;
@@ -112,6 +111,13 @@ public class Brecho {
     public void setDateTimeUpdate(LocalDateTime DateTimeUpdate) {
         this.DateTimeUpdate = DateTimeUpdate;
     }
-    
+
+    public VendedorImages getVendedorImage() {
+        return this.vendedorImagesList;
+    }
+
+    public void setVendedorImage(VendedorImages vendedorImagesList) {
+        this.vendedorImagesList = vendedorImagesList;
+    }
 
 }

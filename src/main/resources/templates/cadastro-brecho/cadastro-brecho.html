@@ -13,9 +13,9 @@
 </head>
 <body>
 <div class="container">
-    <div class="container-cadastro">
+    <div class="container-cadastro mx-auto" style="max-width: 500px;">
         <h1>Não fique de fora.</h1>
-        <form id="vendedorForm" th:action="@{/vendedores/cadastrarVendedor}" method="post">
+        <form id="vendedorForm" th:action="@{/vendedores/cadastrarVendedor}" enctype="multipart/form-data" method="post">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Email" required>
@@ -27,7 +27,7 @@
             </div>
             <div class="form-group">
                 <label for="brechoEndereco">Endereço da loja</label>
-                <input type="text" maxlength="30" class="form-control" id="brechoEndereco" name="brechoEndereco" placeholder="Endereco" required>
+                <input type="text" maxlength="100" class="form-control" id="brechoEndereco" name="brechoEndereco" placeholder="Endereco" required>
                 <small>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="" id="checkOnline" onclick="toggleAddress()">
@@ -43,15 +43,24 @@
             </div>
             <div class="form-group">
                 <label for="vendedorSenha">Senha</label>
-                <input type="password" maxlength="30" class="form-control" id="vendedorSenha" name="senha" placeholder="Senha" required>
+                <input type="password" minlength="8" maxlength="30" class="form-control" id="vendedorSenha" name="senha" placeholder="Senha" required>
             </div>
             <div class="form-group">
                 <label for="vendedorConfirmaSenha">Senha novamente</label>
-                <input type="password" maxlength="30" class="form-control" id="vendedorConfirmaSenha" name="confirmaSenha" placeholder="Senha" required>
+                <input type="password" minlength="8" maxlength="30" class="form-control" id="vendedorConfirmaSenha" name="confirmaSenha" placeholder="Senha" required>
             </div>
+            <div class="form-group text-center">
+                <label for="submitFile" class="d-block logo-txt">Logo da sua marca</label>
+                <div class="custom-file-upload d-flex flex-column">
+                    <input type="file" id="submitFile" name="filename" style="display: none;" onchange="updateFileName()">
+                    <img src="../assets/upload-img.png" style="width: 30px;" onclick="document.getElementById('submitFile').click()" alt="">
+                    <span id="fileName" class="ml-2">Nenhum arquivo selecionado</span>
+                </div>
+            </div>
+            
             <div class="btn-container d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
                 <button type="button" onclick="window.history.back()" class="btn btn-secondary">Voltar</button>
+                <button type="submit"  class="btn btn-primary">Cadastrar</button>
             </div>
         </form>
     </div>

@@ -42,7 +42,7 @@ public class CustomAuthManager implements AuthenticationManager {
         UserDetails userDetails = null;
         UserDetails vendedorDetails = null;
 
-        if (vendedorRepository.findByEmail(username).isPresent()) {
+        if (!vendedorRepository.findByEmail(username).isEmpty()) {
             userDetails = vendedorDetailsService.loadUserByUsername(username);
         } else if (usuarioRepository.findByEmail(username).isPresent()) {
             userDetails = usuarioDetailsService.loadUserByUsername(username);

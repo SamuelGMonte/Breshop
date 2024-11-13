@@ -1,8 +1,12 @@
 package br.com.breshop;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import br.com.breshop.entity.Vendedor;
+import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.repository.VendedorImagesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +16,12 @@ import br.com.breshop.repository.BrechoRepository;
 @Service
 public class BrechoService {
     private final BrechoRepository brechoRepository;
-
+    private final VendedorImagesRepository vendedorImagesRepository;
 
     @Autowired
-    BrechoService(BrechoRepository brechoRepository) {
+    BrechoService(BrechoRepository brechoRepository, VendedorImagesRepository vendedorImagesRepository) {
         this.brechoRepository = brechoRepository;
+        this.vendedorImagesRepository = vendedorImagesRepository;
     }
 
     public List<Brecho> getBrechosByVendedorId(Integer vendedorId) {
@@ -39,6 +44,16 @@ public class BrechoService {
         List<String> brechoOptional = brechoRepository.findAllByBrechoSite();
         return brechoOptional.stream()
         .collect(Collectors.toList());
+    }
+
+    public byte[] getBrechoImg(Vendedor vendedor) {
+        Optional<VendedorImages> brechoOptional = vendedorImagesRepository.findByVendedor(vendedor);
+        return brechoOptional.map(VendedorImages::getImgData)
+                .orElse(new byte[0]);
+    }
+
+    public List<byte[]> getAllBrechoImgs() {
+        return vendedorImagesRepository.findAllByBrechoSite();
     }
 
 }

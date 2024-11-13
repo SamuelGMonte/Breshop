@@ -20,14 +20,28 @@ $(document).ready(function() {
             return;
         }
 
+        const formData = new FormData(this);
+
         const endereco = $("#brechoEndereco").val();
+
+        formData.append('brechoEndereco', isOnlineFlag ? "Online" : endereco);
         
-        const formData = $(this).serialize() + "&endereco=" + (isOnlineFlag ? "Online" : endereco);
-        
+        const fileInput = $('#submitFile')[0];
+
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            console.log("Arquivo selecionado:", file); 
+            formData.append('filename', file);
+        } else {
+            console.log("Nenhum arquivo selecionado.");
+        }
+
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',
             data: formData,
+            processData: false, 
+            contentType: false,
             success: function(successMessage) {
                 Swal.fire({
                     iconHtml: '<img src="../assets/mail-logo.png" style="height: 50px;">',
@@ -60,6 +74,7 @@ $(document).ready(function() {
 });
 
 
+
 function toggleAddress() {
     const addressInput = $("#brechoEndereco");
     const isOnlineOnly = $("#checkOnline").is(":checked");
@@ -67,12 +82,19 @@ function toggleAddress() {
     isOnlineFlag = isOnlineOnly;
 
     if (isOnlineOnly) {
+        addressInput.attr('disabled', true);
         addressInput.val("Online");
     } else {
+        addressInput.attr('disabled', false);
         addressInput.val("");
     }
 }
 
+function updateFileName() {
+    const input = document.getElementById('submitFile');
+    const fileName = input.files.length > 0 ? input.files[0].name : 'Nenhum arquivo selecionado';
+    $('#fileName').text(fileName);
+}
 
 
 function isJSON(str) {

@@ -18,6 +18,36 @@ body {
     font-family: 'Poppins';
 }
 
+.leitura-btn {
+    all: unset;
+}
+
+
+.leitura-btn {
+    display: inline-block;
+    position: relative;
+    font-size: 1rem;
+    color: black;
+}
+
+.leitura-btn:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 4px;
+    bottom: -5px;
+    left: 0;
+    background-color: #ef6305;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.leitura-btn:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
 
 .container-pesquisa > h1 {
     font-size: 3rem;

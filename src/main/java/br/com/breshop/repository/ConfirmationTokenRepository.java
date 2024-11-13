@@ -12,9 +12,10 @@ import org.springframework.stereotype.Repository;
 import br.com.breshop.entity.ConfirmationTokenVendedor;
 import br.com.breshop.entity.Vendedor;
 
-@Repository()
+@Repository
 public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationTokenVendedor, UUID> {
     ConfirmationTokenVendedor findByConfirmationToken(UUID confirmationToken);
     Optional<ConfirmationTokenVendedor> findByVendedor(Vendedor vendedor);
     List<ConfirmationTokenVendedor> findAllByVendedor(Vendedor vendedor);
+    ConfirmationTokenVendedor findTopByVendedorOrderByCreatedDateDesc(Vendedor vendedor);
 }
