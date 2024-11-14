@@ -12,5 +12,5 @@ import br.com.breshop.entity.Vendedor;
 @Repository
 public interface VendedorRepository extends JpaRepository<Vendedor, Integer> {
     @Query("SELECT v FROM Vendedor v WHERE v.email = :email")
-    List<Vendedor> findByEmail(String email);
+    Optional<Vendedor> findByEmail(String email);
 }

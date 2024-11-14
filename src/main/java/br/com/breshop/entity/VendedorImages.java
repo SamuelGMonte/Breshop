@@ -1,9 +1,7 @@
 package br.com.breshop.entity;
 
+import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "tbl_vendedor_imgs")
@@ -15,6 +13,9 @@ public class VendedorImages {
 
     @Column(name = "img_nome")
     private String imgNome;
+
+    @Column(name = "is_verified")
+    private boolean isVerified;
 
     @Column(name = "img_tipo")
     private String imgTipo;
@@ -34,13 +35,14 @@ public class VendedorImages {
     public VendedorImages() {
     }
 
-    public VendedorImages(Integer imagemId, String imgNome, String imgTipo, byte[] imgData, Brecho brechoImg, Vendedor vendedor) {
+    public VendedorImages(Integer imagemId, String imgNome, String imgTipo, byte[] imgData, Brecho brechoImg, Vendedor vendedor, boolean isVerified) {
         this.imagemId = imagemId;
         this.imgNome = imgNome;
         this.imgTipo = imgTipo;
         this.imgData = imgData;
         this.brechoImg = brechoImg;
         this.vendedor = vendedor;
+        this.isVerified = isVerified;
     }
 
     public static class builder {
@@ -50,6 +52,7 @@ public class VendedorImages {
         private byte[] imgData;
         private Brecho brechoImg;
         private Vendedor vendedor;
+        private boolean isVerified;
 
         public builder nome(String imgNome) {
             this.imgNome = imgNome;
@@ -76,8 +79,13 @@ public class VendedorImages {
             return this;
         }
 
+        public builder vendedor(boolean isVerified) {
+            this.isVerified = isVerified;
+            return this;
+        }
+
         public VendedorImages build() {
-            return new VendedorImages(imagemId, imgNome, imgTipo, imgData, brechoImg, vendedor);
+            return new VendedorImages(imagemId, imgNome, imgTipo, imgData, brechoImg, vendedor, isVerified);
         }
     }
 
@@ -128,5 +136,13 @@ public class VendedorImages {
 
     public void setBrechoImg(Brecho brechoImg) {
         this.brechoImg = brechoImg;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
     }
 }

@@ -12,8 +12,8 @@ import br.com.breshop.entity.Brecho;
 
 @Repository
 public interface BrechoRepository extends JpaRepository<Brecho, Integer> {
-    List<Brecho> findByBrechoSite(String brechoSite);
-    List<Brecho> findByBrechoNome(String brechoNome);
+    Optional<Brecho> findByBrechoSite(String brechoSite);
+    Optional<Brecho> findByBrechoNome(String brechoNome);
 
     Optional<Brecho> findByBrechoEndereco(String brechoEndereco);
 

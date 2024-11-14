@@ -1,6 +1,7 @@
 package br.com.breshop.service;
 
 import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.repository.EnabledVendedorImagesRepository;
 import br.com.breshop.repository.VendedorImagesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,8 +12,12 @@ import java.io.IOException;
 @Service
 public class VendedorImagesService {
 
+    private final VendedorImagesRepository vendedorImagesRepository;
+
     @Autowired
-    private VendedorImagesRepository vendedorImagesRepository;
+    public VendedorImagesService(VendedorImagesRepository vendedorImagesRepository, EnabledVendedorImagesRepository enabledVendedorImagesRepository) {
+        this.vendedorImagesRepository = vendedorImagesRepository;
+    }
 
     public String storeFile(MultipartFile file) throws IOException {
         VendedorImages files = new VendedorImages.builder()

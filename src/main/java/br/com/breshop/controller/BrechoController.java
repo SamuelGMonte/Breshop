@@ -30,13 +30,9 @@ public class BrechoController {
     private final BrechoService brechoService;
     private final VendedorRepository vendedorRepository;
 
-    @Value("${nsfw.key}")
-    private String nsfwKey;
-
     public BrechoController(BrechoService brechoService, VendedorRepository vendedorRepository) {
         this.brechoService = brechoService;
         this.vendedorRepository = vendedorRepository;
-
     }
 
     @GetMapping("/{vendedorId}/meus-brechos")
@@ -155,8 +151,12 @@ public class BrechoController {
 
             for (byte[] image : brechosImages) {
                 Map<String, Object> brechoInfo = new HashMap<>();
-                brechoInfo.put("imagem", Base64.getEncoder().encodeToString(image));
-                brechosInfo.add(brechoInfo);
+                if(brechoService.checkVerifiedImage(image)) {
+                    brechoInfo.put("imagem", Base64.getEncoder().encodeToString(image));
+                    brechosInfo.add(brechoInfo);
+                } else {
+                    System.out.println("Imagem não é verificada.");
+                }
             }
 
             response.put("brechos", brechosInfo);

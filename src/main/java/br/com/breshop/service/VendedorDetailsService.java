@@ -21,9 +21,9 @@ public class VendedorDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        List<Vendedor> vendedores = vendedorRepository.findByEmail(email);
-        if (!vendedores.isEmpty()) {
-            Vendedor vendedor = vendedores.get(0);  // Usa o primeiro vendedor encontrado
+        Optional<Vendedor> vendedores = vendedorRepository.findByEmail(email);
+        if (vendedores.isPresent()) {
+            Vendedor vendedor = vendedores.get();  // Usa o primeiro vendedor encontrado
             return new org.springframework.security.core.userdetails.User(
                     vendedor.getEmail(),
                     vendedor.getSenha(),

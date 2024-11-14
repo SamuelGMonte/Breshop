@@ -16,11 +16,16 @@ import java.util.UUID;
 
 import br.com.breshop.entity.VendedorImages;
 import br.com.breshop.repository.*;
+import jakarta.activation.DataSource;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -77,8 +82,8 @@ public class VendedorService {
     }
 
     public Vendedor loadVendedor(CreateVendedorDto createVendedorDto) {
-        List<Vendedor> vendedorList = vendedorRepository.findByEmail(createVendedorDto.email());
-        return vendedorList.isEmpty() ? null : vendedorList.get(0);
+        Optional<Vendedor> vendedorList = vendedorRepository.findByEmail(createVendedorDto.email());
+        return vendedorList.isEmpty() ? null : vendedorList.get();
     }
 
     public void checkTokenExpiration(Vendedor vendedor) {
@@ -124,6 +129,8 @@ public class VendedorService {
 
 
     public ResponseEntity<?> createVendedor(CreateVendedorDto createVendedorDto, CreateBrechoDto createBrechoDto, MultipartFile file) {
+        Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
+        Optional<Brecho> brechos = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
 
         // Validação da senha
         if (createVendedorDto.senha() == null || createVendedorDto.senha().isEmpty()) {
@@ -135,16 +142,18 @@ public class VendedorService {
             throw new IllegalArgumentException("Vendedor já está cadastrado como usuário");
         }
 
-        if(!vendedorRepository.findByEmail(createVendedorDto.email()).isEmpty()) {
+        if(!vendedorRepository.findByEmail(createVendedorDto.email()).isEmpty() && vendedorOptional.get().isIsEnabled()) {
             throw new IllegalArgumentException("Email de vendedor já existe");
         }
 
-        List<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
-        List<Brecho> brechos = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
+        if(!vendedorRepository.findByEmail(createVendedorDto.email()).isEmpty() && !vendedorOptional.get().isIsEnabled()) {
+            checkTokenExpiration(vendedorOptional.get());
+        }
+
 
         // Verifica se o site e brecho já está associado a um brechó
-        if (!vendedorOptional.isEmpty()) {
-            Vendedor vendedor = vendedorOptional.get(0); // Access the first element in the list
+        if (vendedorOptional.isPresent()) {
+            Vendedor vendedor = vendedorOptional.get(); // Access the first element in the list
 
             if (vendedor.isIsEnabled()) {
                 // If the vendedor is enabled, throw an exception
@@ -156,7 +165,7 @@ public class VendedorService {
         }
 
         if (!brechos.isEmpty()) {
-            Brecho brecho = brechos.get(0); // Access the first element in the list
+            Brecho brecho = brechos.get(); // Access the first element in the list
 
             if (brechoRepository.findByBrechoNome(brecho.getBrechoNome()) != null) {
                 throw new UserAlreadyExistsException("Este nome de loja já existe.");
@@ -275,14 +284,14 @@ public class VendedorService {
             throw new IllegalArgumentException("Faça login como usuário.");
         }
 
-        List<Vendedor> vendedorOptional = vendedorRepository.findByEmail(loginVendedorDto.email());
+        Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(loginVendedorDto.email());
 
         // Verifica se o vendedor foi encontrado
         if (vendedorOptional.isEmpty()) {
             throw new IllegalArgumentException("Vendedor não encontrado");
         }
 
-        Vendedor vendedor = vendedorOptional.get(0);
+        Vendedor vendedor = vendedorOptional.get();
 
         // Verifica se a senha informada corresponde à senha armazenada
         if (!passwordEncoder.matches(loginVendedorDto.senha(), vendedor.getSenha())) {
@@ -350,7 +359,6 @@ public class VendedorService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao enviar o e-mail de confirmação");
         }
     }
-
 
 
 }

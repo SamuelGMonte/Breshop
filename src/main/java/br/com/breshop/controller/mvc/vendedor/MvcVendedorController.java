@@ -1,10 +1,18 @@
 package br.com.breshop.controller.mvc.vendedor;
 
+import br.com.breshop.controller.MailService;
+import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.repository.VendedorImagesRepository;
 import br.com.breshop.service.EmailService;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,19 +35,23 @@ import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.service.VendedorService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
+
 @Controller
 @RequestMapping("/vendedores")
 public class MvcVendedorController {
 
     private final VendedorService vendedorService;
     private final UsuarioRepository usuarioRepository;
-    EmailService emailService;
+    private final MailService mailSender;
+    private final VendedorImagesRepository vendedorImagesRepository;
 
     @Autowired
-    public MvcVendedorController(VendedorService vendedorService, UsuarioRepository usuarioRepository, EmailService emailService) {
+    public MvcVendedorController(VendedorService vendedorService, UsuarioRepository usuarioRepository, MailService mailSender, VendedorImagesRepository vendedorImagesRepository) {
         this.vendedorService = vendedorService;
         this.usuarioRepository = usuarioRepository;
-        this.emailService = emailService;
+        this.mailSender = mailSender;
+        this.vendedorImagesRepository = vendedorImagesRepository;
     }
     
     @GetMapping("/login")
@@ -105,16 +117,18 @@ public class MvcVendedorController {
             if(file.isEmpty()) {
                 vendedorService.createVendedor(createVendedorDto, createBrechoDto, null);
             } else {
-                SimpleMailMessage mailMessage = new SimpleMailMessage();
-                mailMessage.setTo("breshop1337@gmail.com");
-                mailMessage.setSubject("Verificação de imagem");
-                mailMessage.setText("Verifique a seguinte imagem do vendedor: " + createVendedorDto.email());
-                emailService.sendEmail(mailMessage);
                 vendedorService.createVendedor(createVendedorDto, createBrechoDto, file);
+                mailSender.mailWithAttachment(
+                        "Verifique se a imagem do vendedor" + createVendedorDto.email() + " é apropriada",
+                        "Verifique a imagem",
+                        file
+                );
             }
             return ResponseEntity.ok("Email enviado com sucesso!");
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
