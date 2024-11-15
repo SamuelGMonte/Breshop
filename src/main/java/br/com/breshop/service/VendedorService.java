@@ -42,6 +42,7 @@ import br.com.breshop.exception.UserAlreadyExistsException;
 import br.com.breshop.exception.UserAlreadyReceivedException;
 import br.com.breshop.security.CustomAuthManager;
 import br.com.breshop.security.jwt.JWTGenerator;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -83,26 +84,26 @@ public class VendedorService {
 
     public Vendedor loadVendedor(CreateVendedorDto createVendedorDto) {
         Optional<Vendedor> vendedorList = vendedorRepository.findByEmail(createVendedorDto.email());
-        return vendedorList.isEmpty() ? null : vendedorList.get();
+        return vendedorList.orElse(null);
     }
 
     public void checkTokenExpiration(Vendedor vendedor) {
         // Retrieve the latest token for the vendedor, if any
         ConfirmationTokenVendedor lastToken = confirmationTokenRepository.findTopByVendedorOrderByCreatedDateDesc(vendedor);
-
+        String formattedExpirationTime = "";
         if (lastToken != null) {
             LocalDateTime currentTime = LocalDateTime.now();
             // Check if the last token was created less than 5 minutes ago
-            if (lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5))) {
+            lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5));
                 // Format the expiration time if it's available
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-                String formattedExpirationTime = lastToken.getDateExpiration() != null ?
+                formattedExpirationTime = lastToken.getDateExpiration() != null ?
                         lastToken.getDateExpiration().format(formatter) : "Unknown time";
 
                 // Throw an exception with the formatted expiration time
-                throw new UserAlreadyReceivedException("O e-mail de confirmação já foi enviado. Tente novamente às: " + formattedExpirationTime);
-            }
+            throw new UserAlreadyReceivedException("O e-mail de confirmação já foi enviado. Tente novamente às: " + formattedExpirationTime);
         }
+        throw new IllegalArgumentException("Token nulo");
     }
 
     public ConfirmationTokenVendedor checkLastToken(Vendedor vendedor) {
@@ -127,54 +128,63 @@ public class VendedorService {
         return token;
     }
 
-
     public ResponseEntity<?> createVendedor(CreateVendedorDto createVendedorDto, CreateBrechoDto createBrechoDto, MultipartFile file) {
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
-        Optional<Brecho> brechos = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
+        Optional<Brecho> brechoOptional = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
 
         // Validação da senha
-        if (createVendedorDto.senha() == null || createVendedorDto.senha().isEmpty()) {
-            throw new IllegalArgumentException("Senha não pode ser nula");
+        if (vendedorOptional.isPresent()) {
+            Vendedor existingVendedor = vendedorOptional.get();
+
+            if (existingVendedor.getIsEnabled()) {
+                throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
+            } else {
+                checkTokenExpiration(existingVendedor);
+
+            }
         }
+
+        // Verifica se o site e brecho já está associado a um brechó
+//        if (vendedorOptional.isPresent()) {
+//            Vendedor vendedor = vendedorOptional.get(); // Access the first element in the list
+//
+//            if (vendedorRepository.findByEmail(vendedor.getEmail()).isPresent()) {
+//                if(!vendedor.isIsEnabled()) {
+//                    checkTokenExpiration(vendedor);
+//                }
+//                if(vendedor.isIsEnabled()) {
+//                    throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
+//                }
+//            }
+//        }
 
         // Verifica se o e-mail já está registrado
         if(usuarioRepository.findByEmail(createVendedorDto.email()).isPresent()) {
             throw new IllegalArgumentException("Vendedor já está cadastrado como usuário");
         }
 
-        if(!vendedorRepository.findByEmail(createVendedorDto.email()).isEmpty() && vendedorOptional.get().isIsEnabled()) {
+        if(vendedorRepository.findByEmail(createVendedorDto.email()).isPresent() && vendedorOptional.get().getIsEnabled()) {
             throw new IllegalArgumentException("Email de vendedor já existe");
         }
 
-        if(!vendedorRepository.findByEmail(createVendedorDto.email()).isEmpty() && !vendedorOptional.get().isIsEnabled()) {
+        if(vendedorRepository.findByEmail(createVendedorDto.email()).isPresent() && !vendedorOptional.get().getIsEnabled()) {
             checkTokenExpiration(vendedorOptional.get());
         }
 
 
-        // Verifica se o site e brecho já está associado a um brechó
-        if (vendedorOptional.isPresent()) {
-            Vendedor vendedor = vendedorOptional.get(); // Access the first element in the list
 
-            if (vendedor.isIsEnabled()) {
-                // If the vendedor is enabled, throw an exception
-                throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
-            } else {
-                // If the vendedor is not enabled, check token expiration
-                checkTokenExpiration(vendedor);
-            }
-        }
 
-        if (!brechos.isEmpty()) {
-            Brecho brecho = brechos.get(); // Access the first element in the list
-
-            if (brechoRepository.findByBrechoNome(brecho.getBrechoNome()) != null) {
-                throw new UserAlreadyExistsException("Este nome de loja já existe.");
-            }
-
-            if (brechoRepository.findByBrechoSite(brecho.getBrechoSite()) != null) {
-                throw new UserAlreadyExistsException("Este site já está associado a um brechó existente.");
-            }
-        }
+//        if (brechoOptional.isPresent()) {
+//            Brecho brecho = brechoOptional.get(); // Access the first element in the list
+//
+//            if (brechoRepository.findByBrechoNome(brecho.getBrechoNome()).isPresent()) {
+//                throw new UserAlreadyExistsException("Este nome de loja já existe.");
+//            }
+//
+//            if (brechoRepository.findByBrechoSite(brecho.getBrechoSite()).isPresent()) {
+//                throw new UserAlreadyExistsException("Este site já está associado a um brechó existente.");
+//            }
+//        }
 
 
         // Cria o Vendedor e o Brecho

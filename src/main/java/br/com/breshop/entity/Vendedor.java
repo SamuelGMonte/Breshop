@@ -130,10 +130,6 @@ public class Vendedor {
         this.dateTimeUpdate = dateTimeUpdate;
     }
 
-    public boolean isIsEnabled() {
-        return this.isEnabled;
-    }
-
     public boolean getIsEnabled() {
         return this.isEnabled;
     }
