@@ -17,5 +17,5 @@ public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationT
     ConfirmationTokenVendedor findByConfirmationToken(UUID confirmationToken);
     Optional<ConfirmationTokenVendedor> findByVendedor(Vendedor vendedor);
     List<ConfirmationTokenVendedor> findAllByVendedor(Vendedor vendedor);
-    ConfirmationTokenVendedor findTopByVendedorOrderByCreatedDateDesc(Vendedor vendedor);
+    ConfirmationTokenVendedor findFirstByVendedorOrderByCreatedDateDesc(Vendedor vendedor);
 }

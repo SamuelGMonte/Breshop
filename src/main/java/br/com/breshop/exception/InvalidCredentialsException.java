@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
-package br.com.breshop.service;
+package br.com.breshop.exception;
 
 
 public class InvalidCredentialsException extends Exception {

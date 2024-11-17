@@ -7,25 +7,19 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.exception.UserAlreadyReceivedException;
 import br.com.breshop.repository.*;
-import jakarta.activation.DataSource;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,10 +33,8 @@ import br.com.breshop.entity.Brecho;
 import br.com.breshop.entity.ConfirmationTokenVendedor;
 import br.com.breshop.entity.Vendedor;
 import br.com.breshop.exception.UserAlreadyExistsException;
-import br.com.breshop.exception.UserAlreadyReceivedException;
 import br.com.breshop.security.CustomAuthManager;
 import br.com.breshop.security.jwt.JWTGenerator;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -87,104 +79,62 @@ public class VendedorService {
         return vendedorList.orElse(null);
     }
 
-    public void checkTokenExpiration(Vendedor vendedor) {
+    public void checkTokenFromVendor(Vendedor vendedor) {
         // Retrieve the latest token for the vendedor, if any
-        ConfirmationTokenVendedor lastToken = confirmationTokenRepository.findTopByVendedorOrderByCreatedDateDesc(vendedor);
+        ConfirmationTokenVendedor lastToken = confirmationTokenRepository.findFirstByVendedorOrderByCreatedDateDesc(vendedor);
         String formattedExpirationTime = "";
         if (lastToken != null) {
             LocalDateTime currentTime = LocalDateTime.now();
             // Check if the last token was created less than 5 minutes ago
-            lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5));
+            if(lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5))) {
                 // Format the expiration time if it's available
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
                 formattedExpirationTime = lastToken.getDateExpiration() != null ?
                         lastToken.getDateExpiration().format(formatter) : "Unknown time";
 
                 // Throw an exception with the formatted expiration time
-            throw new UserAlreadyReceivedException("O e-mail de confirmação já foi enviado. Tente novamente às: " + formattedExpirationTime);
-        }
-        throw new IllegalArgumentException("Token nulo");
-    }
-
-    public ConfirmationTokenVendedor checkLastToken(Vendedor vendedor) {
-        // Retrieve the latest token, if any, using a more efficient query
-        ConfirmationTokenVendedor lastToken = confirmationTokenRepository.findTopByVendedorOrderByCreatedDateDesc(vendedor);
-
-        if (lastToken != null) {
-            LocalDateTime currentTime = LocalDateTime.now();
-            // If the token is recent, call tryAgainTime to handle exception
-            if (lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5))) {
-                checkTokenExpiration(vendedor);  // This will throw an exception if needed
+                throw new UserAlreadyReceivedException("O e-mail de confirmação já foi enviado. Tente novamente às: " + formattedExpirationTime);
             }
+        } else {
+            throw new IllegalArgumentException("Token enviado novamente");
         }
-
-        // Create a new token
-        ConfirmationTokenVendedor token = new ConfirmationTokenVendedor();
-        token.setVendedor(vendedor);
-        token.setConfirmationToken(UUID.randomUUID());
-        token.setCreatedDate(LocalDateTime.now());
-        token.setDateExpiration(LocalDateTime.now().plusMinutes(5));
-
-        return token;
     }
+
 
     public ResponseEntity<?> createVendedor(CreateVendedorDto createVendedorDto, CreateBrechoDto createBrechoDto, MultipartFile file) {
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
         Optional<Brecho> brechoOptional = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
 
-        // Validação da senha
-        if (vendedorOptional.isPresent()) {
-            Vendedor existingVendedor = vendedorOptional.get();
 
-            if (existingVendedor.getIsEnabled()) {
-                throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
-            } else {
-                checkTokenExpiration(existingVendedor);
+        try {
+            // Validação da senha
+            if (vendedorOptional.isPresent()) {
+                Vendedor existingVendedor = vendedorOptional.get();
 
+
+                if (vendedorRepository.findByEmail(existingVendedor.getEmail()).isPresent() && existingVendedor.isPictureEnabled()) {
+                    throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
+                } else {
+                    checkTokenFromVendor(existingVendedor);
+
+                }
             }
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Envio de email novamente.");
         }
 
-        // Verifica se o site e brecho já está associado a um brechó
-//        if (vendedorOptional.isPresent()) {
-//            Vendedor vendedor = vendedorOptional.get(); // Access the first element in the list
-//
-//            if (vendedorRepository.findByEmail(vendedor.getEmail()).isPresent()) {
-//                if(!vendedor.isIsEnabled()) {
-//                    checkTokenExpiration(vendedor);
-//                }
-//                if(vendedor.isIsEnabled()) {
-//                    throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
-//                }
-//            }
-//        }
+
 
         // Verifica se o e-mail já está registrado
         if(usuarioRepository.findByEmail(createVendedorDto.email()).isPresent()) {
             throw new IllegalArgumentException("Vendedor já está cadastrado como usuário");
         }
 
-        if(vendedorRepository.findByEmail(createVendedorDto.email()).isPresent() && vendedorOptional.get().getIsEnabled()) {
-            throw new IllegalArgumentException("Email de vendedor já existe");
-        }
+       if(brechoRepository.findByBrechoSite(createBrechoDto.brechoSite()).isPresent()) {
+           throw new UserAlreadyExistsException("Site do Brechó já está cadastrado no sistema");
+       }
 
-        if(vendedorRepository.findByEmail(createVendedorDto.email()).isPresent() && !vendedorOptional.get().getIsEnabled()) {
-            checkTokenExpiration(vendedorOptional.get());
-        }
-
-
-
-
-//        if (brechoOptional.isPresent()) {
-//            Brecho brecho = brechoOptional.get(); // Access the first element in the list
-//
-//            if (brechoRepository.findByBrechoNome(brecho.getBrechoNome()).isPresent()) {
-//                throw new UserAlreadyExistsException("Este nome de loja já existe.");
-//            }
-//
-//            if (brechoRepository.findByBrechoSite(brecho.getBrechoSite()).isPresent()) {
-//                throw new UserAlreadyExistsException("Este site já está associado a um brechó existente.");
-//            }
-//        }
 
 
         // Cria o Vendedor e o Brecho
@@ -194,9 +144,8 @@ public class VendedorService {
                 passwordEncoder.encode(createVendedorDto.senha()),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                false,
-                false,
-                new ArrayList<>()
+                new ArrayList<>(),
+                false
         );
         vendedorRepository.save(newVendedor);
 
@@ -344,12 +293,12 @@ public class VendedorService {
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (vendedor.getIsEnabled()) {
+        if (vendedor.isPictureEnabled()) {
             response.put("error", "Conta já confirmada");
             return ResponseEntity.badRequest().body(response);
         }
 
-        vendedor.setIsEnabled(true);
+        vendedor.setPictureEnabled(true);
         vendedorRepository.save(vendedor);
 
         //Deleta o token após verificado

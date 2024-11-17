@@ -1,10 +1,10 @@
 package br.com.breshop.controller;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import br.com.breshop.entity.Vendedor;
+import br.com.breshop.repository.VendedorRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class VendedorController {
 
     private final VendedorService vendedorService;
+    private final VendedorRepository vendedorRepository;
 
-    public VendedorController(VendedorService vendedorService) {
+    public VendedorController(VendedorService vendedorService, VendedorRepository vendedorRepository) {
         this.vendedorService = vendedorService;
+        this.vendedorRepository = vendedorRepository;
     }
 
     @PostMapping("/login")
@@ -84,31 +86,43 @@ public class VendedorController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @GetMapping("/confirmar-conta")
-    public ResponseEntity<?> confirmUserAccount(@RequestParam("token") String confirmationToken) {
-        ResponseEntity<?> response = vendedorService.confirmEmail(UUID.fromString(confirmationToken));
+    @GetMapping("/confirmarFoto")
+    public ResponseEntity<?> confirmUserAccount(@RequestParam("vendedorId") Integer vendedorId) {
+        Map<String, String> response = new HashMap<>();
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create("/cadastro-sucesso"))
-                    .build();
-        } else {
-            return ResponseEntity.badRequest().body("Token inválido.");
+        Optional<Vendedor> vendedor = vendedorRepository.findById(vendedorId);
+        List<Integer> vendedorIdJoin = vendedorRepository.findJoinVendedorImage();
+
+        if(vendedor.isPresent()) {
+            if (vendedor.get().isPictureEnabled()) {
+                response.put("status", "error");
+                response.put("message", "Foto já foi verificada anteriormente.");
+                return ResponseEntity.ok(response); // Return early if already enabled
+            }
+
+            // Enable the Vendedor account
+            vendedor.get().setPictureEnabled(true);
+
+            vendedorRepository.save(vendedor.get());
+
+            // Prepare the success response
+            response.put("status", "success");
+            response.put("message", "Foto do vendedor verificada com sucesso.");
+            response.put("vendedorId", String.valueOf(vendedorId));  // Optionally include the ID in the response
+
+            return ResponseEntity.ok(response);
+        }
+        if(vendedorIdJoin.contains(vendedor.get().getVendedorId())) {
+            response.put("status", "error");
+            response.put("message", "Vendedor não tem foto de brechó.");
+            return ResponseEntity.ok(response);
+        }
+
+        // If Vendedor not found, return a bad request response
+        response.put("status", "error");
+        response.put("message", "Erro na verificação da foto: vendedor não encontrado.");
+        return ResponseEntity.badRequest().body(response);
+
         }
     }
-
-
-
-}
-
-
-
-    // @GetMapping("/{vendedorId}")
-    // public ResponseEntity<Vendedor> getVendedorById(@PathVariable("vendedorId") String vendedorId) {
-    //     var vendedor = vendedorService.getVendedorById(UUID.fromString(vendedorId));
-    //     if (vendedor.isPresent()) {
-    //         return ResponseEntity.ok(vendedor.get());
-    //     }
-    //     return ResponseEntity.notFound().build();
-    // }
 

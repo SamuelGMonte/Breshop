@@ -3,6 +3,7 @@ package br.com.breshop.controller.mvc.vendedor;
 import br.com.breshop.controller.MailService;
 import br.com.breshop.entity.VendedorImages;
 import br.com.breshop.repository.VendedorImagesRepository;
+import br.com.breshop.repository.VendedorRepository;
 import br.com.breshop.service.EmailService;
 import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
@@ -33,9 +34,11 @@ import br.com.breshop.exception.UserAlreadyExistsException;
 import br.com.breshop.repository.BrechoRepository;
 import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.service.VendedorService;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/vendedores")
@@ -44,16 +47,17 @@ public class MvcVendedorController {
     private final VendedorService vendedorService;
     private final UsuarioRepository usuarioRepository;
     private final MailService mailSender;
-    private final VendedorImagesRepository vendedorImagesRepository;
+    private final VendedorRepository vendedorRepository;
+
 
     @Autowired
-    public MvcVendedorController(VendedorService vendedorService, UsuarioRepository usuarioRepository, MailService mailSender, VendedorImagesRepository vendedorImagesRepository) {
+    public MvcVendedorController(VendedorService vendedorService, UsuarioRepository usuarioRepository, MailService mailSender, VendedorRepository vendedorRepository) {
         this.vendedorService = vendedorService;
         this.usuarioRepository = usuarioRepository;
         this.mailSender = mailSender;
-        this.vendedorImagesRepository = vendedorImagesRepository;
+        this.vendedorRepository = vendedorRepository;
     }
-    
+
     @GetMapping("/login")
     public String showLoginVendedor(Model model) {
         model.addAttribute("vendedor", new Vendedor());
@@ -87,6 +91,7 @@ public class MvcVendedorController {
         return "cadastro-brecho/cadastro-brecho";
     }
 
+
     @PostMapping("/cadastrarVendedor")
     public ResponseEntity<String> cadastrarVendedorFromMvc(
             @ModelAttribute CreateVendedorDto createVendedorDto,
@@ -94,6 +99,7 @@ public class MvcVendedorController {
             @RequestParam String confirmaSenha,
             @RequestParam("filename") MultipartFile file,
             BindingResult result) {
+
 
 
         // Verifica se as senhas coincidem
@@ -118,8 +124,14 @@ public class MvcVendedorController {
                 vendedorService.createVendedor(createVendedorDto, createBrechoDto, null);
             } else {
                 vendedorService.createVendedor(createVendedorDto, createBrechoDto, file);
+                Optional<Integer> vendedorOptional =  vendedorRepository.findIdByEmail(createVendedorDto.email());
+
+                Integer vendedorId = vendedorOptional.get();
+
+                String verificationUrl = "http://localhost:8080/api/v1/vendedores/confirmarFoto?vendedorId=" + vendedorId;
+
                 mailSender.mailWithAttachment(
-                        "Verifique se a imagem do vendedor" + createVendedorDto.email() + " é apropriada",
+                        "Verifique se a imagem do vendedor " + createVendedorDto.email() + " é apropriada, se for clique aqui: " + verificationUrl,
                         "Verifique a imagem",
                         file
                 );

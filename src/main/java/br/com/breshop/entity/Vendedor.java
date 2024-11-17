@@ -45,22 +45,21 @@ public class Vendedor {
     @UpdateTimestamp
     private LocalDateTime dateTimeUpdate;
 
-    private boolean isEnabled;
 
-    private boolean received;
+    @Column(name = "picture_enabled", nullable = false)
+    private boolean pictureEnabled = false;
 
     public Vendedor() {
     }
 
-    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, boolean isEnabled, boolean received, List<Brecho> brechos) {
+    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, List<Brecho> brechos, boolean pictureEnabled) {
         this.username = username;
         this.email = email;
         this.senha = senha;
         this.dateTimeInsert = dateTimeInsert;
         this.dateTimeUpdate = dateTimeUpdate;
-        this.isEnabled = isEnabled;
-        this.received = received;
         this.brechos = brechos;
+        this.pictureEnabled = pictureEnabled;
 
         if (brechos != null) {
             for (Brecho brecho : brechos) {
@@ -130,24 +129,12 @@ public class Vendedor {
         this.dateTimeUpdate = dateTimeUpdate;
     }
 
-    public boolean getIsEnabled() {
-        return this.isEnabled;
+    public boolean isPictureEnabled() {
+        return pictureEnabled;
     }
 
-    public void setIsEnabled(boolean isEnabled) {
-        this.isEnabled = isEnabled;
-    }
-
-    public boolean isReceived() {
-        return this.received;
-    }
-
-    public boolean getReceived() {
-        return this.received;
-    }
-
-    public void setReceived(boolean received) {
-        this.received = received;
+    public void setPictureEnabled(boolean pictureEnabled) {
+        this.pictureEnabled = pictureEnabled;
     }
 
     public List<Brecho> getBrechos() {

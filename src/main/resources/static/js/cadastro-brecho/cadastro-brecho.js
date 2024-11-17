@@ -36,6 +36,14 @@ $(document).ready(function() {
             console.log("Nenhum arquivo selecionado.");
         }
 
+        Swal.fire({
+            title: 'Processando...',
+            text: 'Por favor, aguarde.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',
@@ -105,3 +113,5 @@ function isJSON(str) {
         return false;
     }
 }
+
+
