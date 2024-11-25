@@ -19,6 +19,12 @@ public interface BrechoRepository extends JpaRepository<Brecho, Integer> {
 
     Optional<Brecho> findByBrechoEndereco(String brechoEndereco);
 
+    @Query("SELECT b.brechoEndereco FROM Brecho b WHERE b.vendedor.vendedorId = :vendedorId")
+    List<String> findBrechoEnderecoByVendedorId(Integer vendedorId);
+
+    @Query("SELECT b.brechoSite FROM Brecho b WHERE b.vendedor.vendedorId = :vendedorId")
+    List<String> findBrechoSiteByVendedorId(Integer vendedorId);
+
     @Query("SELECT b FROM Brecho b WHERE b.vendedor.vendedorId = :vendedorId")
     List<Brecho> findByVendedorId(@Param("vendedorId") Integer vendedorId);
 
@@ -30,4 +36,5 @@ public interface BrechoRepository extends JpaRepository<Brecho, Integer> {
 
     @Query("SELECT b.brechoSite FROM Brecho b")
     List<String> findAllByBrechoSite();
+
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import br.com.breshop.entity.Brecho;
 import br.com.breshop.repository.BrechoRepository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class MvcBrechoController {
@@ -22,8 +23,11 @@ public class MvcBrechoController {
         return "pesquisa-brecho/pesquisa-brecho";
     }
 
-    @GetMapping("/{vendedorId}/brecho")
-    public String brechosPage(Model model) {
+    @GetMapping("vendedor/{vendedorId}/brecho")
+    public String brechosPage(Model model, @PathVariable Integer vendedorId) {
+        if(brechoRepository.findByVendedorId(vendedorId).isEmpty()) {
+            return "404";
+        }
         model.addAttribute("brecho", new Brecho());
         return "meus-brechos/meus-brechos";
     }

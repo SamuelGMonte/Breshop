@@ -37,13 +37,22 @@ $(document).ready(function() {
         }
 
         Swal.fire({
+<<<<<<< Updated upstream
             title: 'Processando...',
             text: 'Por favor, aguarde.',
+=======
+            title: 'Carregando...',
+            text: 'Aguarde enquanto validamos suas informações.',
+>>>>>>> Stashed changes
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
             }
         });
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',

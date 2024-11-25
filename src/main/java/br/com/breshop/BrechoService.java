@@ -31,6 +31,18 @@ public class BrechoService {
         return brechoRepository.findByVendedorId(vendedorId);
     }
 
+    public List<String> getBrechoEndereco(Integer vendedorId) {
+        List<String> brechoOptional = brechoRepository.findBrechoEnderecoByVendedorId(vendedorId);
+        return brechoOptional.stream()
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getBrechoSite(Integer vendedorId) {
+        List<String> brechoOptional = brechoRepository.findBrechoSiteByVendedorId(vendedorId);
+        return brechoOptional.stream()
+                .collect(Collectors.toList());
+    }
+
     public List<String> getAllBrechosNomes() {
         List<String> brechoOptional = brechoRepository.findAllByBrechoNome();
         return brechoOptional.stream()
@@ -62,5 +74,7 @@ public class BrechoService {
     public List<byte[]> getAllBrechoImgs() {
         return vendedorImagesRepository.findAllByBrechoSite();
     }
+
+
 
 }

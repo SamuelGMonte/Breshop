@@ -6,6 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.breshop.repository.BrechoRepository;
+import br.com.breshop.repository.VendedorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -24,6 +27,9 @@ public class JWTGenerator {
 
     public long JWT_EXPIRATION = SecurityConstants.EXPIRATION_TIME;
     private Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
+    @Autowired
+    VendedorRepository vendedorRepository;
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();

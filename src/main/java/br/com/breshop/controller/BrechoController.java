@@ -88,6 +88,29 @@ public class BrechoController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @GetMapping("{vendedorId}/enderecos")
+    public ResponseEntity<?> getEnderecosById(@PathVariable Integer vendedorId) {
+        Map<String, Object> response = new HashMap<>();
+        List<String> enderecos = brechoService.getBrechoEndereco(vendedorId);
+
+        if (!enderecos.isEmpty()) {
+            if(enderecos.size() > 1) {
+                for(String e: enderecos) {
+                    response.put("enderecos", e);
+                }
+            } else {
+                response.put("status", "success");
+                response.put("enderecos", enderecos);
+                return ResponseEntity.ok(response);
+            }
+        }
+
+        response.put("status", "error");
+        response.put("message", "Nenhum endereço encontrado");
+        return ResponseEntity.badRequest().body(response);
+    }
+
+
 
     @GetMapping("/sites")
     public ResponseEntity<?> getSites() {
@@ -105,7 +128,23 @@ public class BrechoController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @GetMapping("/imagens/{vendedorId}")
+    @GetMapping("{vendedorId}/site")
+    public ResponseEntity<?> getSite(@PathVariable Integer vendedorId) {
+        List<String> enderecos = brechoService.getBrechoSite(vendedorId);
+        Map<String, Object> response = new HashMap<>();
+
+        if (!enderecos.isEmpty()) {
+            response.put("status", "success");
+            response.put("websites", enderecos);
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("status", "error");
+        response.put("message", "Nenhum endereço encontrado");
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping("{vendedorId}/imagens")
     public ResponseEntity<?> getBrechosImageByVendedorId(@PathVariable Integer vendedorId) {
         Map<String, Object> response = new HashMap<>();
         Optional<Vendedor> vendedorOptional = vendedorRepository.findById(vendedorId);

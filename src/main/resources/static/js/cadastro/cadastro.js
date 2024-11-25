@@ -20,7 +20,7 @@ $(document).ready(function() {
         }
 
         const formData = $(this).serialize(); 
-
+        
         $.ajax({
             url: $(this).attr('action'),
             method: 'POST',

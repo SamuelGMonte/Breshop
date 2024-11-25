@@ -12,89 +12,96 @@
 <body>
 
     <nav class="navbar navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand">BreShop</a>
-            <div class="login-container">
-                <button class="logout-trigger"  style="display: none;">
-                    <img id="img-logout" th:src="@{assets/quit-icon.webp}" alt="">
-                    <div class="logout">Sair</div>
-                </button>
-                <button class="login-trigger" type="button" data-toggle="collapse" data-target="#loginOptions" aria-expanded="false">
-                    Login <span class="dropdown-arrow">▾</span>
-                </button>
-                
-                <div class="collapse login-dropdown shadow" id="loginOptions">
-                    <a href="usuarios/login" class="login-option">
-                        <span>Login para</span>
-                        <div>Usuários</div>
-                    </a>
-                    <a href="/vendedores/login" class="login-option">
-                        <span>Login para</span>
-                        <div>Vendedores</div>
-                    </a>
-                </div>
+        <a class="navbar-brand">BreShop</a>
+        <div class="login-container">
+            <button class="logout-trigger"  style="display: none;">
+                <img id="img-logout" th:src="@{assets/quit-icon.webp}" alt="">
+                <div class="logout">Sair</div>
+            </button>
+            <button class="login-trigger" type="button" data-toggle="collapse" data-target="#loginOptions" aria-expanded="false">
+                Login <span class="dropdown-arrow">▾</span>
+            </button>
+            
+            <div class="collapse login-dropdown shadow" id="loginOptions">
+                <a href="usuarios/login" class="login-option">
+                    <span>Login para</span>
+                    <div>Usuários</div>
+                </a>
+                <a href="/vendedores/login" class="login-option">
+                    <span>Login para</span>
+                    <div>Vendedores</div>
+                </a>
             </div>
         </div>
     </nav>
 
     
     <div class="hero">
-        
-
-        <div class="container mx-auto d-flex justify-content-center align-items-center">
+        <div class="container mx-auto d-flex justify-content-center align-items-center section-color">
             <div class="text">
                 <h1><b>Olhe, <br>Compare, <br><span class="underline-animation">Compre.</span></h1>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, rem possimus! Eius ducimus harum veritatis possimus optio aperiam impedit cupiditate. Nulla maiores reprehenderit libero! Suscipit ad distinctio voluptates rem? Non.
                     Fuga tempore impedit, alias non nesmo rerum possimus</p>
                 </div>
             </div>
-
-
-
-            
-    </div>
-
-    <div class="container">
-        <div class="container-content">
-            <div class="text-content">
-                <h1 style="text-align: center;"><b>Conosco, você terá a melhor experiência de brechós online.<b></h1>
-            </div>
-                <div class="cadastro-brecho" style="text-align: center;">
-                    <a href="vendedores/cadastro-brecho"><button type="button" class="btn-cadastro">Cadastre seu brechó</button></a>
-                </div>
-                <div class="procura-brecho" style="text-align: center;">
-                    <a id="anchor-procura" href="/pesquisa-brecho"><button type="button" class="btn-procura">Procure brechós cadastrados</button></a>
-                </div>
-        </div>
     </div>
     
-    <div class="container-cadastro">
-        <h1>Não fique de fora.</h1>
-        <form id="usuarioForm" th:action="@{/usuarios/cadastrarUsuario}" method="post">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" required>
-                <small id="emailHelp" class="form-text text-muted">Seu e-mail não será compartilhado.</small>
+    <!-- <div class="container-strip-breshop">
+        <div class="strip-breshop"></div>
+    </div> -->
+
+    <div class="container-content section-color">
+        <div class="text-content">
+            <h1 style="text-align: center;"><b>Conosco, você terá a melhor experiência de brechós online.<b></h1>
+        </div>
+            <div class="cadastro-brecho" style="text-align: center;">
+                <a href="vendedores/cadastro-brecho"><button type="button" class="btn-cadastro">Cadastre seu brechó</button></a>
             </div>
-            <div class="form-group">
-                <label for="usuarioSenha">Senha</label>
-                <input type="password" maxlength="30" class="form-control" id="usuarioSenha" name="senha" placeholder="Senha" required>
+            <div class="procura-brecho" style="text-align: center;">
+                <a id="anchor-procura" href="/pesquisa-brecho"><button type="button" class="btn-procura">Procure brechós cadastrados</button></a>
             </div>
-            <div class="form-group">
-                <label for="usuarioConfirmaSenha">Senha novamente</label>
-                <input type="password" maxlength="30" class="form-control" id="usuarioConfirmaSenha" name="confirmaSenha" placeholder="Senha" required>
+    </div>
+    
+    <div class="container-cadastro section-color">
+        <h1><span class="underline-scroll-animation">Não</span> fique de fora.</h1>
+        <div class="signup-container">
+            <div class="left-box">
+                <form id="usuarioForm" th:action="@{/usuarios/cadastrarUsuario}" method="post">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" required>
+                        <small id="emailHelp" class="form-text text-muted">Seu e-mail não será compartilhado.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="usuarioSenha">Senha</label>
+                        <input type="password" maxlength="30" minlength="8" class="form-control" id="usuarioSenha" name="senha" placeholder="Senha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="usuarioConfirmaSenha">Senha novamente</label>
+                        <input type="password" maxlength="30" minlength="8" class="form-control" id="usuarioConfirmaSenha" name="confirmaSenha" placeholder="Senha" required>
+                    </div>
+                    <div class="btn-container d-flex justify-content-center">
+                        <button type="submit">Cadastrar <span>&#x27f6</span></button>
+                    </div>
+                </form>
             </div>
-            <div class="btn-container d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <div class="right-box">
+                <a href=""><svg xmlns="http://www.w3.org/2000/svg" style="height: 20px;" viewBox="0 0 488 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+                    Entre com o Google</a>
             </div>
-        </form>
+        </div>
     </div>
 
-    <footer>
-        <div class="container-fluid">
-            <p class="text-center">2024, Developed By Samuel Monte</p>
-        </div>
-    </footer>
+    <div class="brecho-container section-color">
+
+    </div>
+
+    
+    <div class="footer-container">
+        <p class="text-center">2024, Developed By Samuel Monte</p>
+        <footer></footer>
+    </div>
+
     <!-- JQuery -->
     <script th:src="@{js/jquery/jquery-3.7.1.min.js}"></script>
     <!-- Bootstrap JS -->
@@ -103,9 +110,13 @@
     <script type="module" defer th:src="@{js/auth/auth.js}"></script>
     <!-- Custom JS -->
     <script th:src="@{js/index.js}"></script>
+    <script th:src="@{js/background.js}"></script>
     <!--Live reload script-->
     <script src="http://localhost:35729/livereload.js"></script>
     <!-- Swal -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <!-- JWT Decode -->
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    
 </body>
 </html>

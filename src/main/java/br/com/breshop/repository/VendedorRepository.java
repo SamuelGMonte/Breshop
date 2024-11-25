@@ -16,9 +16,14 @@ public interface VendedorRepository extends JpaRepository<Vendedor, Integer> {
     @Query("SELECT v FROM Vendedor v WHERE v.email = :email")
     Optional<Vendedor> findByEmail(String email);
 
+<<<<<<< Updated upstream
     @Query("SELECT v.id FROM Vendedor v WHERE v.email = :email")
     Optional<Integer> findIdByEmail(String email);
 
     @Query("SELECT v.id FROM VendedorImages v LEFT JOIN Vendedor f ON v.id = f.id")
     List<Integer> findJoinVendedorImage();
+=======
+    Integer findIdByEmail(String email);
+
+>>>>>>> Stashed changes
 }

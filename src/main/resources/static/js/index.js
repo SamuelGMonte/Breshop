@@ -1,15 +1,18 @@
+const token = localStorage.getItem('jwtToken');
 $(document).ready(function() {
-    const token = localStorage.getItem('jwtToken');
     if (token) {
         $('.btn-cadastro').hide();
         $('.login-trigger').hide();
         $('.logout-trigger').show();
         $('.container-cadastro').hide();
+        $('.container-content').hide();
+        generateBrecho();
     } else {
         $('.btn-cadastro').show();
         $('.login-trigger').show();
         $('.logout-trigger').hide();
         $('.container-cadastro').show();
+        $('.container-content').show();
     }
 
     $('#usuarioForm').on('submit', function(event) {        
@@ -29,6 +32,15 @@ $(document).ready(function() {
         }
 
         const formData = $(this).serialize(); 
+
+        Swal.fire({
+            title: 'Carregando...',
+            text: 'Aguarde enquanto criamos seu usuário.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         $.ajax({
             url: $(this).attr('action'),
@@ -104,3 +116,22 @@ document.addEventListener('click', function(event) {
 window.addEventListener('load', function() {
     document.querySelector('.underline-animation').classList.add('active');
 });
+
+
+function generateBrecho() {
+
+    const payload = jwt_decode(token);
+    const userId = payload.userId;
+    console.log("User ID:", userId);
+    
+
+    const brechoContainer = $(".brecho-container");
+    const brechoContent = `
+     <div class="meus-brechos">
+        <h1>Navegue pelo seus brechós!</h1>
+        <p>Clique <a href="">Aqui!</span></p>
+    </div>
+`
+    brechoContainer.append(brechoContent);
+
+}
