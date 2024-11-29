@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,26 +35,31 @@ public class Brecho {
     private Vendedor vendedor;
 
     @CreationTimestamp
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime DateTimeInsert;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private LocalDateTime dateTimeInsert;
 
     @UpdateTimestamp
-    private LocalDateTime DateTimeUpdate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private LocalDateTime dateTimeUpdate;
 
     @OneToOne(mappedBy = "brechoImg", cascade = CascadeType.ALL)
     private VendedorImages vendedorImagesList;
 
+    @Column(name = "brecho_descricao", columnDefinition = "Text")
+    private String brechoDescricao;
+
     public Brecho() {
     }
 
-    public Brecho(String brechoNome, String brechoSite, String brechoEndereco, Vendedor vendedor, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, VendedorImages vendedorImagesList) {
+    public Brecho(String brechoNome, String brechoSite, String brechoEndereco, Vendedor vendedor, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, VendedorImages vendedorImagesList, String brechoDescricao) {
         this.brechoNome = brechoNome;
         this.brechoSite = brechoSite;
         this.brechoEndereco = brechoEndereco;
         this.vendedor = vendedor;
-        this.DateTimeInsert = dateTimeInsert;
-        this.DateTimeUpdate = dateTimeUpdate;
+        this.dateTimeInsert = dateTimeInsert;
+        this.dateTimeUpdate = dateTimeUpdate;
         this.vendedorImagesList = vendedorImagesList;
+        this.brechoDescricao = brechoDescricao;
     }
 
     public Integer getBrechoId() {
@@ -96,20 +102,20 @@ public class Brecho {
         this.vendedor = vendedor;
     }
 
-    public LocalDateTime getDateTimeInsert() {
-        return this.DateTimeInsert;
+    public LocalDateTime getdateTimeInsert() {
+        return this.dateTimeInsert;
     }
 
-    public void setDateTimeInsert(LocalDateTime DateTimeInsert) {
-        this.DateTimeInsert = DateTimeInsert;
+    public void setdateTimeInsert(LocalDateTime dateTimeInsert) {
+        this.dateTimeInsert = dateTimeInsert;
     }
 
-    public LocalDateTime getDateTimeUpdate() {
-        return this.DateTimeUpdate;
+    public LocalDateTime getdateTimeUpdate() {
+        return this.dateTimeUpdate;
     }
 
-    public void setDateTimeUpdate(LocalDateTime DateTimeUpdate) {
-        this.DateTimeUpdate = DateTimeUpdate;
+    public void setdateTimeUpdate(LocalDateTime dateTimeUpdate) {
+        this.dateTimeUpdate = dateTimeUpdate;
     }
 
     public VendedorImages getVendedorImage() {
@@ -120,4 +126,11 @@ public class Brecho {
         this.vendedorImagesList = vendedorImagesList;
     }
 
+    public String getBrechoDescricao() {
+        return brechoDescricao;
+    }
+
+    public void setBrechoDescricao(String brechoDescricao) {
+        this.brechoDescricao = brechoDescricao;
+    }
 }

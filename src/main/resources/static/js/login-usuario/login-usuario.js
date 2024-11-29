@@ -1,5 +1,6 @@
+
 $(document).ready(function() {
-    const token = localStorage.getItem('jwtToken');
+    const token = Cookies.get('jwtToken');
     if (token) {
         window.location.href = '/'; 
     }
@@ -27,7 +28,7 @@ $(document).ready(function() {
                     text: 'Login realizado com sucesso!',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    localStorage.setItem('jwtToken', response.token);
+                    Cookies.set('jwtToken', response.token, { path: '/' });
                     window.location.href = '/';
                 });
             },

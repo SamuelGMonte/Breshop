@@ -1,9 +1,9 @@
 package br.com.breshop.dto;
 
-public class ErrorResponseDTO {
+public class ErrorResponseDto {
     private String message;
 
-    public ErrorResponseDTO(String message) {
+    public ErrorResponseDto(String message) {
         this.message = message;
     }
 

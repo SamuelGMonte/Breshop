@@ -80,22 +80,14 @@ public class VendedorService {
         return vendedorList.orElse(null);
     }
 
-<<<<<<< Updated upstream
-    public void checkTokenFromVendor(Vendedor vendedor) {
-=======
     public boolean checkTokenExpiration(Vendedor vendedor) {
->>>>>>> Stashed changes
         // Retrieve the latest token for the vendedor, if any
         ConfirmationTokenVendedor lastToken = confirmationTokenRepository.findFirstByVendedorOrderByCreatedDateDesc(vendedor);
         String formattedExpirationTime = "";
         if (lastToken != null) {
             LocalDateTime currentTime = LocalDateTime.now();
             // Check if the last token was created less than 5 minutes ago
-<<<<<<< Updated upstream
-            if(lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5))) {
-=======
             boolean result = lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5));
->>>>>>> Stashed changes
                 // Format the expiration time if it's available
             if(!result) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
@@ -106,27 +98,8 @@ public class VendedorService {
 
 
                 // Throw an exception with the formatted expiration time
-<<<<<<< Updated upstream
-                throw new UserAlreadyReceivedException("O e-mail de confirmação já foi enviado. Tente novamente às: " + formattedExpirationTime);
-=======
         }
         return false;
-    }
-
-    public ConfirmationTokenVendedor checkLastToken(Vendedor vendedor) {
-        // Retrieve the latest token, if any, using a more efficient query
-        ConfirmationTokenVendedor lastToken = confirmationTokenRepository.findTopByVendedorOrderByCreatedDateDesc(vendedor);
-
-        if (lastToken != null) {
-            LocalDateTime currentTime = LocalDateTime.now();
-            // If the token is recent, call tryAgainTime to handle exception
-            if (lastToken.getCreatedDate().isAfter(currentTime.minusMinutes(5))) {
-                checkTokenExpiration(vendedor);  // This will throw an exception if needed
->>>>>>> Stashed changes
-            }
-        } else {
-            throw new IllegalArgumentException("Token enviado novamente");
-        }
     }
 
 
@@ -134,31 +107,9 @@ public class VendedorService {
         Optional<Vendedor> vendedorOptional = vendedorRepository.findByEmail(createVendedorDto.email());
         Optional<Brecho> brechoOptional = brechoRepository.findByBrechoSite(createBrechoDto.brechoSite());
 
-<<<<<<< Updated upstream
-
-        try {
-            // Validação da senha
-            if (vendedorOptional.isPresent()) {
-                Vendedor existingVendedor = vendedorOptional.get();
-
-
-                if (vendedorRepository.findByEmail(existingVendedor.getEmail()).isPresent() && existingVendedor.isPictureEnabled()) {
-                    throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
-                } else {
-                    checkTokenFromVendor(existingVendedor);
-
-                }
-            }
-
-        } catch (IllegalArgumentException e) {
-            System.out.println("Envio de email novamente.");
-        }
-
-
-=======
         if (vendedorOptional.isPresent()) {
             Vendedor existingVendedor = vendedorOptional.get();
-            if(createVendedorDto.email().equals(vendedorOptional.get().getEmail()) || existingVendedor.getIsEnabled()) {
+            if(createVendedorDto.email().equals(vendedorOptional.get().getEmail()) || existingVendedor.isEnabled()) {
                 throw new UserAlreadyExistsException("Este email já está associado a um vendedor existente.");
             }
 
@@ -171,7 +122,6 @@ public class VendedorService {
                 throw new UserAlreadyExistsException("Este site já está associado a um brechó/vendedor existente.");
             }
         }
->>>>>>> Stashed changes
 
         // Verifica se o e-mail já está registrado
         if(usuarioRepository.findByEmail(createVendedorDto.email()).isPresent()) {
@@ -192,6 +142,7 @@ public class VendedorService {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 new ArrayList<>(),
+                false,
                 false
         );
         vendedorRepository.save(newVendedor);
@@ -223,7 +174,8 @@ public class VendedorService {
                         newVendedor,
                         LocalDateTime.now(),
                         LocalDateTime.now(),
-                        vendedorImagem
+                        vendedorImagem,
+                        null
                 );
 
                 brechoRepository.save(brecho);
@@ -246,6 +198,7 @@ public class VendedorService {
                     newVendedor,
                     LocalDateTime.now(),
                     LocalDateTime.now(),
+                    null,
                     null
             );
             brechoRepository.save(brecho);

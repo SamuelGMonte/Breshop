@@ -1,27 +1,30 @@
 package br.com.breshop.controller;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import br.com.breshop.entity.Vendedor;
-import br.com.breshop.entity.VendedorImages;
-import br.com.breshop.repository.VendedorRepository;
-import br.com.breshop.service.VendedorService;
-import jakarta.servlet.http.HttpServletResponse;
+import br.com.breshop.dto.AllBrechosDto;
+import br.com.breshop.dto.BrechoDescricaoDto;
+import br.com.breshop.dto.CreateBrechoDto;
+import br.com.breshop.repository.BrechoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.breshop.BrechoService;
 import br.com.breshop.entity.Brecho;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
+import br.com.breshop.entity.Vendedor;
+import br.com.breshop.repository.VendedorRepository;
+import br.com.breshop.security.jwt.JWTGenerator;
 
 
 @RestController
@@ -29,16 +32,31 @@ import org.springframework.web.multipart.MultipartFile;
 public class BrechoController {
     private final BrechoService brechoService;
     private final VendedorRepository vendedorRepository;
+    private final JWTGenerator jwtg;
+    private final BrechoRepository brechoRepository;
 
-    public BrechoController(BrechoService brechoService, VendedorRepository vendedorRepository) {
+    @Autowired
+    public BrechoController(BrechoService brechoService, VendedorRepository vendedorRepository, JWTGenerator jwtg, BrechoRepository brechoRepository) {
         this.brechoService = brechoService;
         this.vendedorRepository = vendedorRepository;
+        this.jwtg = jwtg;
+        this.brechoRepository = brechoRepository;
     }
 
-    @GetMapping("/{vendedorId}/meus-brechos")
-    public ResponseEntity<?> getBrechosByVendedorId(@PathVariable Integer vendedorId) {
-        List<Brecho> brechos = brechoService.getBrechosByVendedorId(vendedorId);
+    @GetMapping("/meus-brechos")
+    public ResponseEntity<?> getBrechosByVendedorId(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
+        String actualToken = token.replace("Bearer", "");
+
+        Integer userId = jwtg.getUserIdFromJWT(actualToken);
+        List<Brecho> brechos = brechoService.getBrechosByVendedorId(userId);
+
+        String userRole = jwtg.getUserRoleFromJWT(actualToken);
+        if(!userRole.equalsIgnoreCase("Vendedor")) {
+            response.put("status", "error");
+            response.put("message", "Cadastrado como usuário e não vendedor");
+            return ResponseEntity.badRequest().body("");
+        }
 
         if (!brechos.isEmpty()) {
             List<String> brechoNames = brechos.stream()
@@ -55,6 +73,12 @@ public class BrechoController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @GetMapping("/envio-token")
+    public ResponseEntity<String> handleData(@RequestHeader("Authorization") String token) {
+        System.out.println("Received data: " + token);
+
+        return ResponseEntity.ok("Data received successfully");
+    }
 
     @GetMapping("/nomes")
     public ResponseEntity<?> getNomes() {
@@ -88,10 +112,15 @@ public class BrechoController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @GetMapping("{vendedorId}/enderecos")
-    public ResponseEntity<?> getEnderecosById(@PathVariable Integer vendedorId) {
+    @GetMapping("/endereco")
+    public ResponseEntity<?> getEnderecosById(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
-        List<String> enderecos = brechoService.getBrechoEndereco(vendedorId);
+
+        String actualToken = token.replace("Bearer", "");
+
+        Integer userId = jwtg.getUserIdFromJWT(actualToken);
+
+        List<String> enderecos = brechoService.getBrechoEndereco(userId);
 
         if (!enderecos.isEmpty()) {
             if(enderecos.size() > 1) {
@@ -128,10 +157,14 @@ public class BrechoController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @GetMapping("{vendedorId}/site")
-    public ResponseEntity<?> getSite(@PathVariable Integer vendedorId) {
-        List<String> enderecos = brechoService.getBrechoSite(vendedorId);
+    @GetMapping("/site")
+    public ResponseEntity<?> getSite(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
+        String actualToken = token.replace("Bearer", "");
+
+        Integer userId = jwtg.getUserIdFromJWT(actualToken);
+
+        List<String> enderecos = brechoService.getBrechoSite(userId);
 
         if (!enderecos.isEmpty()) {
             response.put("status", "success");
@@ -144,17 +177,31 @@ public class BrechoController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @GetMapping("{vendedorId}/imagens")
-    public ResponseEntity<?> getBrechosImageByVendedorId(@PathVariable Integer vendedorId) {
+    @GetMapping("/imagem")
+    public ResponseEntity<?> getBrechosImageByVendedorId(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
-        Optional<Vendedor> vendedorOptional = vendedorRepository.findById(vendedorId);
+
+        String actualToken = token.replace("Bearer", "");
+
+        Integer userId = jwtg.getUserIdFromJWT(actualToken);
+        List<Brecho> brechos = brechoService.getBrechosByVendedorId(userId);
+
+        String userRole = jwtg.getUserRoleFromJWT(actualToken);
+
+        Optional<Vendedor> vendedorOptional = vendedorRepository.findById(userId);
 
         if (vendedorOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vendedor não encontrado");
         }
 
+        if(!userRole.equalsIgnoreCase("Vendedor")) {
+            response.put("status", "error");
+            response.put("message", "Cadastrado como usuário e não vendedor");
+            return ResponseEntity.badRequest().body("");
+        }
+
+
         Vendedor vendedor = vendedorOptional.get();
-        List<Brecho> brechos = brechoService.getBrechosByVendedorId(vendedorId);
         byte[] imagemBrecho = brechoService.getBrechoImg(vendedor);
 
         if (!brechos.isEmpty()) {
@@ -200,15 +247,52 @@ public class BrechoController {
 
             response.put("brechos", brechosInfo);
         } else {
-            response.put("status", "error");
+            response.put("status", "success");
             response.put("message", "Nenhuma imagem encontrada");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.ok().body(response);
         }
 
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/salvar-descricao")
+    public ResponseEntity<?> saveText(@RequestHeader("Authorization") String token, @RequestBody() BrechoDescricaoDto brechoDescricaoDto) {
+        System.out.println("Texto recebido: " + brechoDescricaoDto.descricao());
 
+        String actualToken = token.replace("Bearer", "");
+
+        Integer userId = jwtg.getUserIdFromJWT(actualToken);
+
+        brechoService.updateBrechoDescricao(userId, brechoDescricaoDto);
+
+        return ResponseEntity.ok("Texto salvo!");
+    }
+
+    @GetMapping("/descricao/{brechoId}")
+    public ResponseEntity<?> getText(@PathVariable Integer brechoId) {
+        Map<String, Object> response = new HashMap<>();
+
+        String brechoDescricao = brechoService.getBrechoDescricao(brechoId);
+
+        if(brechoDescricao.isEmpty()) {
+            response.put("status", "error");
+            response.put("message", "Descrição vazia");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        response.put("status", "success");
+        response.put("message", brechoDescricao);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/brechos")
+    public ResponseEntity<List<AllBrechosDto>> getAllBrechos() {
+        List<Brecho> brechos = brechoRepository.findAll();
+        List<AllBrechosDto> brechoDTOs = brechos.stream()
+                .map(brecho -> new AllBrechosDto(brecho.getBrechoId(), brecho.getBrechoNome()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(brechoDTOs);
+    }
 
 
 

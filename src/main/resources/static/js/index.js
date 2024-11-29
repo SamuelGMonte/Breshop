@@ -1,4 +1,4 @@
-const token = localStorage.getItem('jwtToken');
+const token = Cookies.get('jwtToken');
 $(document).ready(function() {
     if (token) {
         $('.btn-cadastro').hide();
@@ -77,7 +77,7 @@ $(document).ready(function() {
     });
 
     $('.logout-trigger').on('click', function() {
-        localStorage.removeItem('jwtToken'); 
+        Cookies.remove('jwtToken'); 
         $('.btn-cadastro').show(); 
         $('.logout-trigger').hide();
         Swal.fire({
@@ -120,16 +120,28 @@ window.addEventListener('load', function() {
 
 function generateBrecho() {
 
-    const payload = jwt_decode(token);
-    const userId = payload.userId;
-    console.log("User ID:", userId);
+    if(token) {
+        try {
+            const decodedPayload = jwt_decode(token);
+            console.log('Decoded Payload:', decodedPayload);
+
+            console.log('User ID:', decodedPayload.sub); 
+            console.log('Name:', decodedPayload.name);
+        }
+        catch (error) {
+            console.error('Error decoding JWT:', error.message);
+        }
+    } 
     
+    else {
+        console.error('Token JWT não encontrado.');
+    }
 
     const brechoContainer = $(".brecho-container");
     const brechoContent = `
      <div class="meus-brechos">
-        <h1>Navegue pelo seus brechós!</h1>
-        <p>Clique <a href="">Aqui!</span></p>
+        <h1 class="text-center">Navegue pelo seus brechós!</h1>
+        <p class="text-center">Clique <a href="vendedor/meu-brecho">Aqui!</span></p>
     </div>
 `
     brechoContainer.append(brechoContent);

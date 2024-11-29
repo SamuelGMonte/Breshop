@@ -3,6 +3,7 @@ package br.com.breshop.entity;
 import java.time.LocalDateTime;
 import java.util.List; // Import List
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -39,14 +40,16 @@ public class Usuario {
     private List<ConfirmationTokenUser> confirmationTokenUsers;
 
     @CreationTimestamp
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private LocalDateTime dateTimeInsert;
 
     @UpdateTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private LocalDateTime dateTimeUpdate;
 
     private boolean isEnabled;
 
+    @ColumnDefault("0")
     private boolean received;
 
     public Usuario() {

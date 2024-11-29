@@ -1,23 +1,31 @@
 package br.com.breshop.controller;
 
-import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import br.com.breshop.entity.Vendedor;
-import br.com.breshop.repository.VendedorRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.breshop.dto.CreateBrechoDto;
 import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
+import br.com.breshop.entity.Vendedor;
 import br.com.breshop.exception.UserAlreadyExistsException;
+import br.com.breshop.repository.VendedorRepository;
 import br.com.breshop.service.VendedorService;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/vendedores")

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import br.com.breshop.dto.BrechoDescricaoDto;
 import br.com.breshop.entity.Vendedor;
 import br.com.breshop.entity.VendedorImages;
 import br.com.breshop.repository.EnabledVendedorImagesRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.breshop.entity.Brecho;
 import br.com.breshop.repository.BrechoRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BrechoService {
@@ -67,6 +69,28 @@ public class BrechoService {
                 .orElse(new byte[0]);
     }
 
+    @Transactional
+    public void updateBrechoDescricao(Integer brechoId, BrechoDescricaoDto brechoDescricaoDto) {
+        Optional<Brecho> optionalBrecho = brechoRepository.findById(brechoId);
+
+        if (optionalBrecho.isPresent()) {
+            Brecho brecho = optionalBrecho.get();
+
+            brecho.setBrechoDescricao(brechoDescricaoDto.descricao());
+
+            brechoRepository.save(brecho);
+        } else {
+            throw new RuntimeException("Brechó não encontrado com ID " + brechoId);
+        }
+    }
+
+    public String getBrechoDescricao(Integer brechoId) {
+        Brecho brecho = brechoRepository.findById(brechoId)
+                .orElseThrow(() -> new RuntimeException("Brechó não encontrado com ID " + brechoId));
+
+        return brecho.getBrechoDescricao();
+    }
+
     public boolean checkVerifiedImage(byte[] vendedor) {
         return enabledVendedorImagesRepository.isVerified(vendedor);
     }
@@ -75,6 +99,11 @@ public class BrechoService {
         return vendedorImagesRepository.findAllByBrechoSite();
     }
 
+    public String getBrechoId(String brechoName) {
+        Brecho brecho = brechoRepository.findByBrechoNome(brechoName)
+                .orElseThrow(() -> new RuntimeException("Brechó não encontrado com nome " + brechoName));
 
+        return brecho.getBrechoNome();
+    }
 
 }

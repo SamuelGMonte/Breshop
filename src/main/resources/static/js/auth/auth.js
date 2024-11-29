@@ -6,7 +6,7 @@ const LOGIN_PAGE_URL = '/';
 
 // Set token in AJAX requests
 $(document).ajaxSend(function(e, xhr, options) {
-    const token = localStorage.getItem('jwtToken');
+    const token = Cookies.get('jwtToken');
     if (token) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         // console.log("Token enviado:", token);

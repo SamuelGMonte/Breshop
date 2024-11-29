@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const token = localStorage.getItem('jwtToken');
+    const token = Cookies.get('jwtToken');
     if (token) {
         window.location.href = '/'; 
     }

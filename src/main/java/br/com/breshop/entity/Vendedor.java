@@ -39,20 +39,23 @@ public class Vendedor {
     private List<Brecho> brechos = new ArrayList<>();
 
     @CreationTimestamp
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private LocalDateTime dateTimeInsert;
 
     @UpdateTimestamp
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private LocalDateTime dateTimeUpdate;
-
 
     @Column(name = "picture_enabled", nullable = false)
     private boolean pictureEnabled = false;
 
+    @Column(name = "is_enabled", nullable = false)
+    private boolean isEnabled = false;
+
     public Vendedor() {
     }
 
-    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, List<Brecho> brechos, boolean pictureEnabled) {
+    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, List<Brecho> brechos, boolean pictureEnabled, boolean isEnabled) {
         this.username = username;
         this.email = email;
         this.senha = senha;
@@ -60,6 +63,7 @@ public class Vendedor {
         this.dateTimeUpdate = dateTimeUpdate;
         this.brechos = brechos;
         this.pictureEnabled = pictureEnabled;
+        this.isEnabled = isEnabled;
 
         if (brechos != null) {
             for (Brecho brecho : brechos) {
@@ -135,6 +139,14 @@ public class Vendedor {
 
     public void setPictureEnabled(boolean pictureEnabled) {
         this.pictureEnabled = pictureEnabled;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 
     public List<Brecho> getBrechos() {

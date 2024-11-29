@@ -2,6 +2,11 @@ const body = $('body');
 const sectionColor = $('.sectionColor'); 
 const spanTag = $('.underline-scroll-animation');
 
+const h1 = $('h1');
+const btnProcura = $('.btn-procura');
+const btnCadastro = $('.btn-cadastro');
+const p = $('p');
+
 body.css("backgroundColor", "rgb(224, 224, 224)");
 
 sectionColor.each((index, section) => {
@@ -20,11 +25,17 @@ $(window).on("scroll", function() {
     const maximumTopScroll = body.prop('scrollHeight') - $(window).height(); 
     const scrollFraction = topScroll / maximumTopScroll;
 
-    const red = 224 - Math.round(140 * scrollFraction);
-    const green = 224 - Math.round(140 * scrollFraction);
-    const blue = 224 - Math.round(140 * scrollFraction);
+    const red = 224 - Math.round(250 * scrollFraction);
+    const green = 224 - Math.round(250 * scrollFraction);
+    const blue = 224 - Math.round(250 * scrollFraction);
+
+    const red2 = Math.round(350 * scrollFraction);
+    const green2 =  Math.round(350 * scrollFraction);
+    const blue2 =  Math.round(350 * scrollFraction);
+
 
     const bColor = `rgb(${red}, ${green}, ${blue})`;
+    const elColor = `rgb(${red2}, ${green2}, ${blue2})`;
 
     const totalHeight = $(document).height()
 
@@ -34,6 +45,9 @@ $(window).on("scroll", function() {
         spanTag.removeClass('active');
     }
     
-
+    h1.css("color", elColor);
+    p.css("color", elColor);
+    btnProcura.css("color", elColor);
+    btnCadastro.css("color", elColor);
     body.css("backgroundColor", bColor); 
 });
