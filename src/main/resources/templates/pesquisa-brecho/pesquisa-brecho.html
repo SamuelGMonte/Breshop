@@ -21,7 +21,16 @@
     <div class="container container-pesquisa">
       <a href="javascript:window.history.back();">Voltar</a>
       <h1>Procura por brechó</h1>
-      <input type="text" placeholder="Procure aqui seu brechó">
+      <form id="searchForm">
+        <input
+            type="text"
+            name="searchQuery"
+            id="searchInput"
+            placeholder="Procure aqui seu brechó"
+        />
+        <button type="submit">Buscar</button>
+    </form>
+    <div id="results" class="results-container"></div>
       <div id="cardContainer">
         <div class="modal fade" id="modalDescricao" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">

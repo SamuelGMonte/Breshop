@@ -91,6 +91,7 @@ public class BrechoService {
         return brecho.getBrechoDescricao();
     }
 
+
     public boolean checkVerifiedImage(byte[] vendedor) {
         return enabledVendedorImagesRepository.isVerified(vendedor);
     }
@@ -99,11 +100,8 @@ public class BrechoService {
         return vendedorImagesRepository.findAllByBrechoSite();
     }
 
-    public String getBrechoId(String brechoName) {
-        Brecho brecho = brechoRepository.findByBrechoNome(brechoName)
-                .orElseThrow(() -> new RuntimeException("Brechó não encontrado com nome " + brechoName));
-
-        return brecho.getBrechoNome();
+    public Brecho getBrechoNome(String brechoName) {
+        return brechoRepository.findByBrechoNome(brechoName);
     }
 
 }

@@ -15,7 +15,8 @@ import br.com.breshop.entity.Brecho;
 @Repository
 public interface BrechoRepository extends JpaRepository<Brecho, Integer> {
     Optional<Brecho> findByBrechoSite(String brechoSite);
-    Optional<Brecho> findByBrechoNome(String brechoNome);
+    @Query("SELECT b FROM Brecho b WHERE LOWER(b.brechoNome) = LOWER(:brechoNome)")
+    Brecho findByBrechoNome(String brechoNome);
 
     Optional<Brecho> findByBrechoEndereco(String brechoEndereco);
 

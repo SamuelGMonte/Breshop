@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    
+
     $.when(
         $.ajax({ url: `/api/v1/brecho/nomes` }),
         $.ajax({ url: `/api/v1/brecho/enderecos` }),
@@ -23,6 +25,23 @@ $(document).ready(function () {
                 site: sites[index] || 'Site not available',
                 img: images[index] || './store'
             }));
+
+            $("#searchForm").on("submit", function (e) {
+                e.preventDefault();
+                const keyword = $("#searchInput").val().toLowerCase().trim();
+        
+                const filteredData = combinedData.filter(item =>
+                    item.nome.toLowerCase().includes(keyword) ||
+                    item.endereco.toLowerCase().includes(keyword) ||
+                    item.site.toLowerCase().includes(keyword)
+                );
+        
+                const container = document.getElementById("cardContainer");
+                if (container) {
+                    container.innerHTML = ""; 
+                    initVirtualScroller(container, filteredData);
+                }
+            });
 
             function initVirtualScroller(container, items) {
                 const ITEM_HEIGHT = 250;

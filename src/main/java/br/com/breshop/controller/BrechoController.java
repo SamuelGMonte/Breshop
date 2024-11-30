@@ -294,6 +294,19 @@ public class BrechoController {
         return ResponseEntity.ok(brechoDTOs);
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<?> searchProducts(@RequestParam String keyword) {
+        Map<String, Object> response = new HashMap<>();
+        Brecho brechos = brechoService.getBrechoNome(keyword);
+        if(brechos == null) {
+            response.put("status", "error");
+            response.put("message", "Nenhum brechó encontrado");
+            return ResponseEntity.badRequest().body(response);
+        }
+        response.put("status", "success");
+        response.put("message", brechos);
+        return ResponseEntity.ok(response);
+    }
 
 
 }
