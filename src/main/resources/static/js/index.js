@@ -5,7 +5,6 @@ $(document).ready(function() {
         $('.login-trigger').hide();
         $('.logout-trigger').show();
         $('.container-cadastro').hide();
-        $('.container-content').hide();
         generateBrecho();
     } else {
         $('.btn-cadastro').show();
@@ -123,10 +122,10 @@ function generateBrecho() {
     if(token) {
         try {
             const decodedPayload = jwt_decode(token);
-            console.log('Decoded Payload:', decodedPayload);
-
-            console.log('User ID:', decodedPayload.sub); 
-            console.log('Name:', decodedPayload.name);
+            
+            if(decodedPayload.role === "Usuario") {
+                return;
+            }
         }
         catch (error) {
             console.error('Error decoding JWT:', error.message);
@@ -137,10 +136,12 @@ function generateBrecho() {
         console.error('Token JWT não encontrado.');
     }
 
+    
+
     const brechoContainer = $(".brecho-container");
     const brechoContent = `
      <div class="meus-brechos">
-        <h1 class="text-center">Navegue pelo seus brechós!</h1>
+        <h1 class="text-center" style="color: white;">Gerencie seu brechó!</h1>
         <p class="text-center">Clique <a href="vendedor/meu-brecho">Aqui!</span></p>
     </div>
 `

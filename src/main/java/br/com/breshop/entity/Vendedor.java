@@ -30,12 +30,7 @@ public class Vendedor {
     @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ConfirmationTokenVendedor> confirmationTokenVendedors;
 
-    @ManyToMany
-    @JoinTable(
-            name = "tbl_vendedor_brecho",
-            joinColumns = @JoinColumn(name = "tbl_vendedor_id"),
-            inverseJoinColumns = @JoinColumn(name = "tbl_brecho_id")
-    )
+    @OneToMany(mappedBy = "vendedor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Brecho> brechos = new ArrayList<>();
 
     @CreationTimestamp
@@ -46,23 +41,19 @@ public class Vendedor {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private LocalDateTime dateTimeUpdate;
 
-    @Column(name = "picture_enabled", nullable = false)
-    private boolean pictureEnabled = false;
-
     @Column(name = "is_enabled", nullable = false)
     private boolean isEnabled = false;
 
     public Vendedor() {
     }
 
-    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, List<Brecho> brechos, boolean pictureEnabled, boolean isEnabled) {
+    public Vendedor(String username, String email, String senha, LocalDateTime dateTimeInsert, LocalDateTime dateTimeUpdate, List<Brecho> brechos, boolean isEnabled) {
         this.username = username;
         this.email = email;
         this.senha = senha;
         this.dateTimeInsert = dateTimeInsert;
         this.dateTimeUpdate = dateTimeUpdate;
         this.brechos = brechos;
-        this.pictureEnabled = pictureEnabled;
         this.isEnabled = isEnabled;
 
         if (brechos != null) {
@@ -133,13 +124,6 @@ public class Vendedor {
         this.dateTimeUpdate = dateTimeUpdate;
     }
 
-    public boolean isPictureEnabled() {
-        return pictureEnabled;
-    }
-
-    public void setPictureEnabled(boolean pictureEnabled) {
-        this.pictureEnabled = pictureEnabled;
-    }
 
     public boolean isEnabled() {
         return isEnabled;

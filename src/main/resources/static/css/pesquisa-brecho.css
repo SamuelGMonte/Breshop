@@ -55,3 +55,56 @@ body {
     text-align: center;
 }
 
+
+#modalDescricao .modal-body {
+    white-space: normal;
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+}
+
+#searchForm {
+    padding: 10px;
+    border: 0;
+    outline: none;
+    font-size: 25px;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#searchForm input  {
+    color: #fff;
+    border:none; 
+    border-radius:10px; 
+    min-width: 120px;
+}
+
+#searchForm button  {
+    background-color:#0a0a23;
+    margin-left: 10px;
+    color: #fff;
+    border:none; 
+    border-radius:10px; 
+    min-width: 120px;
+}
+
+.card_content-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-around;
+}
+
+
+
+.left-container {
+    border: #0a0a238d 3px solid;
+    align-self: center;
+}
+
+@media (max-width: 485px) {    
+    #searchForm button {
+        margin-top: 10px;
+    }
+}

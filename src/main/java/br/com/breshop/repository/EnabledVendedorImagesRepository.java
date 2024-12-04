@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface EnabledVendedorImagesRepository extends JpaRepository<VendedorImages, Long> {
-    @Query("SELECT CASE WHEN COUNT(v) > 0 THEN true ELSE false END " +
+    @Query("SELECT COUNT(v) > 0 " +
             "FROM VendedorImages v WHERE v.imgData = :vendedorImg AND v.isVerified = true")
     boolean isVerified(@Param("vendedorImg") byte[] vendedorImg);
 

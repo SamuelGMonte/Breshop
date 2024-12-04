@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.repository.VendedorImagesRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import br.com.breshop.dto.CreateVendedorDto;
 import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
 import br.com.breshop.entity.Vendedor;
+import br.com.breshop.exception.BrechoAlreadyExistsException;
 import br.com.breshop.exception.UserAlreadyExistsException;
 import br.com.breshop.repository.VendedorRepository;
 import br.com.breshop.service.VendedorService;
@@ -33,10 +36,12 @@ public class VendedorController {
 
     private final VendedorService vendedorService;
     private final VendedorRepository vendedorRepository;
+    private final VendedorImagesRepository vendedorImagesRepository;
 
-    public VendedorController(VendedorService vendedorService, VendedorRepository vendedorRepository) {
+    public VendedorController(VendedorService vendedorService, VendedorRepository vendedorRepository, VendedorImagesRepository vendedorImagesRepository) {
         this.vendedorService = vendedorService;
         this.vendedorRepository = vendedorRepository;
+        this.vendedorImagesRepository = vendedorImagesRepository;
     }
 
     @PostMapping("/login")
@@ -86,7 +91,7 @@ public class VendedorController {
                 response.put("message", "Verifique o email pelo link enviado ao seu endereço de email");
                 return ResponseEntity.ok(response);
             }
-        } catch (UserAlreadyExistsException e) {
+        } catch (UserAlreadyExistsException | BrechoAlreadyExistsException e) {
             response.put("status", "error");
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
@@ -99,24 +104,26 @@ public class VendedorController {
         Map<String, String> response = new HashMap<>();
 
         Optional<Vendedor> vendedor = vendedorRepository.findById(vendedorId);
-        List<Integer> vendedorIdJoin = vendedorRepository.findJoinVendedorImage();
+
+        List<Integer> vendedorIdJoin = vendedorImagesRepository.findJoinVendedorImage();
+
 
         if(vendedor.isPresent()) {
-            if (vendedor.get().isPictureEnabled()) {
+            Optional<VendedorImages> vendedorImages = vendedorImagesRepository.findByVendedor(vendedor.get());
+
+            if (vendedorImages.get().isVerified()) {
                 response.put("status", "error");
                 response.put("message", "Foto já foi verificada anteriormente.");
-                return ResponseEntity.ok(response); // Return early if already enabled
+                return ResponseEntity.ok(response);
             }
 
-            // Enable the Vendedor account
-            vendedor.get().setPictureEnabled(true);
+            vendedorImages.get().setVerified(true);
 
-            vendedorRepository.save(vendedor.get());
+            vendedorImagesRepository.save(vendedorImages.get());
 
-            // Prepare the success response
             response.put("status", "success");
             response.put("message", "Foto do vendedor verificada com sucesso.");
-            response.put("vendedorId", String.valueOf(vendedorId));  // Optionally include the ID in the response
+            response.put("vendedorId", String.valueOf(vendedorId));
 
             return ResponseEntity.ok(response);
         }
@@ -126,7 +133,6 @@ public class VendedorController {
             return ResponseEntity.ok(response);
         }
 
-        // If Vendedor not found, return a bad request response
         response.put("status", "error");
         response.put("message", "Erro na verificação da foto: vendedor não encontrado.");
         return ResponseEntity.badRequest().body(response);

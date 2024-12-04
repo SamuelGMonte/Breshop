@@ -8,7 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.breshop.controller.MailService;
@@ -18,6 +23,7 @@ import br.com.breshop.dto.LoginVendedorDto;
 import br.com.breshop.dto.jwt.AuthResponseDTO;
 import br.com.breshop.entity.Brecho;
 import br.com.breshop.entity.Vendedor;
+import br.com.breshop.exception.BrechoAlreadyExistsException;
 import br.com.breshop.exception.UserAlreadyExistsException;
 import br.com.breshop.repository.UsuarioRepository;
 import br.com.breshop.repository.VendedorRepository;
@@ -120,7 +126,7 @@ public class MvcVendedorController {
                 );
             }
             return ResponseEntity.ok("Email enviado com sucesso!");
-        } catch (UserAlreadyExistsException e) {
+        } catch (UserAlreadyExistsException | BrechoAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);

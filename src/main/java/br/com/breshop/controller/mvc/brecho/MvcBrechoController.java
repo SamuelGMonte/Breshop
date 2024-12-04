@@ -4,6 +4,7 @@ import br.com.breshop.controller.BrechoController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -52,8 +53,12 @@ public class MvcBrechoController {
 
         ResponseEntity<?> response = brechoController.getBrechosByVendedorId(actualToken);
 
-        if (response.getStatusCode().is4xxClientError()) {
+        if (response.getStatusCode() == HttpStatus.NOT_FOUND ) {
             return "404";
+        }
+
+        if (response.getStatusCode() == HttpStatus.UNAUTHORIZED ) {
+            return "401";
         }
 
         return "meus-brechos/meus-brechos";

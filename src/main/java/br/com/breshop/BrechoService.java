@@ -63,8 +63,8 @@ public class BrechoService {
         .collect(Collectors.toList());
     }
 
-    public byte[] getBrechoImg(Vendedor vendedor) {
-        Optional<VendedorImages> brechoOptional = vendedorImagesRepository.findByVendedor(vendedor);
+    public byte[] getBrechoImg(Integer vendedorId) {
+        Optional<VendedorImages> brechoOptional = vendedorImagesRepository.findByVendedorId(vendedorId);
         return brechoOptional.map(VendedorImages::getImgData)
                 .orElse(new byte[0]);
     }

@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    
 
     $.when(
         $.ajax({ url: `/api/v1/brecho/nomes` }),
@@ -11,20 +10,29 @@ $(document).ready(function () {
 
         if (nomesResponse[0].status === "success" && 
             enderecosResponse[0].status === "success" && 
-            siteResponse[0].status === "success" && 
-            imageResponse[0].status === "success" ) {
+            siteResponse[0].status === "success"  ) {
             
             const nomes = nomesResponse[0].nomes;
             const enderecos = enderecosResponse[0].enderecos;
             const sites = Array.isArray(siteResponse[0].websites) ? siteResponse[0].websites : [];
-            const images = Array.isArray(imageResponse[0].image) ? imageResponse[0].image : [];
+            const verifiedBrechos = imageResponse[0].brechos; 
 
-            const combinedData = nomes.map((nome, index) => ({
-                nome,
-                endereco: enderecos[index] || 'Address not available',
-                site: sites[index] || 'Site not available',
-                img: images[index] || './store'
-            }));
+            const combinedData = nomes.map((nome, index) => {
+                const normalizedNome = nome.toLowerCase().trim();
+                
+                const storeImage = verifiedBrechos.find(brecho => 
+                    brecho.brechoNome.toLowerCase().trim() === normalizedNome
+                )?.imagem || null;
+            
+            
+                return {
+                    nome,
+                    endereco: enderecos[index] || 'Address not available',
+                    site: sites[index] || 'Site not available',
+                    img: storeImage 
+                };
+            });
+                                              
 
             $("#searchForm").on("submit", function (e) {
                 e.preventDefault();
@@ -58,20 +66,11 @@ $(document).ready(function () {
                 container.appendChild(wrapper);
 
                 const itemCache = new Map();
-
+                
                 function createItemElement(item, index) {
                     if (itemCache.has(index)) {
                         return itemCache.get(index);
                     }
-                    
-                    const itemElement = document.createElement('div');
-                    itemElement.style.position = 'absolute';
-                    itemElement.style.top = `${index * ITEM_HEIGHT}px`;
-                    itemElement.style.width = '100%';
-                    itemElement.style.willChange = 'transform'; 
-
-                    const url = item.site.startsWith("http") ? item.site : "#";
-                    const imgTag = item.img.startsWith('data:') ? item.img : `data:image/png;base64,${item.img}`;
 
                     const getIdByName = (brechoName) => {
                         const store = brechosId[0].find(brecho => {
@@ -80,17 +79,28 @@ $(document).ready(function () {
                         return store ? store.id : null;
                     };
                     
+
+                    const itemElement = document.createElement('div');
+                    itemElement.style.position = 'absolute';
+                    itemElement.style.top = `${index * ITEM_HEIGHT}px`;
+                    itemElement.style.width = '100%';
+                    itemElement.style.willChange = 'transform'; 
+
+                    const url = item.site.startsWith("http") ? item.site : "#";
+                    
+                    const imgTag = item.img ? `<img class="card-img-top" src="data:image/png;base64, ${item.img}" style="width: 50px" loading="lazy">` : `<img class="card-img-top" src="../assets/store.png" style="width: 50px" loading="lazy">`;
+                    
                     
                     window.get_descricao = function (brechoNome) {
-                        let brechoId = getIdByName(brechoNome);
+                        var brechoId = getIdByName(brechoNome);
                         $.ajax({
                             url: `/api/v1/brecho/descricao/${brechoId}`,
                             method: "GET",
                             success: function (descricaoResponse) {
                                 if (descricaoResponse.status === "success") {
                                     $("#modalDescricao .modal-title").text("Descrição do Brechó");
-                                    $("#modalDescricao .modal-body").html(`
-                                        <p>${descricaoResponse.message}</p>
+                                    $("#modalDescricao .modal-body").text(`
+                                        ${descricaoResponse.message}
                                     `);
                     
                                     $("#modalDescricao").modal("show");
@@ -104,17 +114,21 @@ $(document).ready(function () {
                         });
                     };
 
-                    
-                    
 
                     itemElement.innerHTML = `
                         <div class="card">
-                            <img class="card-img-top" src="${imgTag}" alt="Imagem do brechó" loading="lazy">
-                            <div class="card-body">
-                                <h5 class="card-title">${item.nome}</h5>
-                                <p class="card-text">Endereço: ${item.endereco}</p>
-                                <p class="card-text">Site: <a href="${url}" target="_blank">${item.site}</a></p>
-                                <button class="btn leitura-btn" onclick="get_descricao('${item.nome}')" data-target="#modalDescricao">Ler mais</button>
+                            <div class="card_content-container">
+                                <div class="left-container">
+                                    ${imgTag}
+                                </div>
+                                <div class="right-container">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.nome}</h5>
+                                        <p class="card-text">Endereço: ${item.endereco}</p>
+                                        <p class="card-text">Site: <a href="${url}" target="_blank">${item.site}</a></p>
+                                        <button class="btn leitura-btn" onclick="get_descricao('${item.nome}')" data-target="#modalDescricao">Ler mais</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     `;

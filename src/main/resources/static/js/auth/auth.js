@@ -1,7 +1,4 @@
-var isLoggedOut = false;
 var isInactive = true;
-const INACTIVITY_TIMEOUT = 15 * 60 * 1000;  // 15 minutes timeout
-let inactivityTimer;
 const LOGIN_PAGE_URL = '/';  
 
 // Set token in AJAX requests
@@ -13,17 +10,26 @@ $(document).ajaxSend(function(e, xhr, options) {
     }
 });
 
-// // Handle unauthorized responses (401 errors)
-// $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError) {
-//     if (jqXHR.status === 401 && !isLoggedOut) {
-//         isLoggedOut = true;
-//         console.log("Token expirado");
 
-//         localStorage.removeItem('jwtToken');
-//         window.location.href = LOGIN_PAGE_URL;  // Redirect to login page
-
-//         alert("Sessão expirada ou você foi deslogado por inatividade. Logue novamente.");
-        
-//     }
-// });
-
+$(document).ajaxError(function(event, xhr) {
+    if (xhr.status === 401) {
+        try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.message === "Sessão expirada, por favor, logue novamente") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sessão Expirada',
+                    text: response.message,
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    Cookies.remove('jwtToken');
+                    window.location.href = LOGIN_PAGE_URL;
+                });
+            }
+        } catch (error) {
+            console.error("Error parsing server response:", error);
+        }
+    } else {
+        console.error("AJAX error occurred:", xhr.status, xhr.responseText);
+    }
+});

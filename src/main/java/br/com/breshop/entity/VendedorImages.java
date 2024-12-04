@@ -28,8 +28,8 @@ public class VendedorImages {
     @JoinColumn(name = "vendedor_id")
     private Vendedor vendedor;
 
-    @OneToOne
-    @JoinColumn(name = "brecho_id")
+    @ManyToOne
+    @JoinColumn(name = "brecho_id", referencedColumnName = "brecho_id")
     private Brecho brechoImg;
 
     public VendedorImages() {

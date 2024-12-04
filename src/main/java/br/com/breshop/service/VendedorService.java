@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import br.com.breshop.entity.VendedorImages;
+import br.com.breshop.exception.BrechoAlreadyExistsException;
 import br.com.breshop.exception.UserAlreadyReceivedException;
 import br.com.breshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +118,7 @@ public class VendedorService {
         }
 
         if (brechoOptional.isPresent()) {
-            Brecho brecho = brechoOptional.get(); // Access the first element in the list
+            Brecho brecho = brechoOptional.get();
             if (!brechoRepository.findBrechoSiteByVendedorId(brechoOptional.get().getBrechoId()).isEmpty() || createBrechoDto.brechoSite().equals(brechoOptional.get().getBrechoSite())){
                 throw new UserAlreadyExistsException("Este site já está associado a um brechó/vendedor existente.");
             }
@@ -132,6 +133,9 @@ public class VendedorService {
            throw new UserAlreadyExistsException("Site do Brechó já está cadastrado no sistema");
        }
 
+        if(brechoRepository.findByBrechoNome(createBrechoDto.brechoNome()) != null) {
+            throw new BrechoAlreadyExistsException("Este nome de brechó já existe");
+        }
 
 
         // Cria o Vendedor e o Brecho
@@ -142,7 +146,6 @@ public class VendedorService {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 new ArrayList<>(),
-                false,
                 false
         );
         vendedorRepository.save(newVendedor);
@@ -293,12 +296,12 @@ public class VendedorService {
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (vendedor.isPictureEnabled()) {
+        if (vendedor.isEnabled()) {
             response.put("error", "Conta já confirmada");
             return ResponseEntity.badRequest().body(response);
         }
 
-        vendedor.setPictureEnabled(true);
+        vendedor.setEnabled(true);
         vendedorRepository.save(vendedor);
 
         //Deleta o token após verificado

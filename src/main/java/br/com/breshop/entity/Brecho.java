@@ -19,6 +19,7 @@ public class Brecho {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "brecho_id")
     private Integer brechoId;
 
     @Column(name = "brecho_nome")
@@ -45,7 +46,8 @@ public class Brecho {
     @OneToOne(mappedBy = "brechoImg", cascade = CascadeType.ALL)
     private VendedorImages vendedorImagesList;
 
-    @Column(name = "brecho_descricao", columnDefinition = "Text")
+    @Lob
+    @Column(name = "brecho_descricao", length=512)
     private String brechoDescricao;
 
     public Brecho() {

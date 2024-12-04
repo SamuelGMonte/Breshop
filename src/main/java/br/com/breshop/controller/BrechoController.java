@@ -1,23 +1,21 @@
 package br.com.breshop.controller;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import br.com.breshop.repository.VendedorImagesRepository;
+import br.com.breshop.util.TokenExpiration;
+
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import br.com.breshop.dto.AllBrechosDto;
 import br.com.breshop.dto.BrechoDescricaoDto;
-import br.com.breshop.dto.CreateBrechoDto;
 import br.com.breshop.repository.BrechoRepository;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.breshop.BrechoService;
@@ -34,22 +32,32 @@ public class BrechoController {
     private final VendedorRepository vendedorRepository;
     private final JWTGenerator jwtg;
     private final BrechoRepository brechoRepository;
+    private final VendedorImagesRepository vendedorImagesRepository;
 
     @Autowired
-    public BrechoController(BrechoService brechoService, VendedorRepository vendedorRepository, JWTGenerator jwtg, BrechoRepository brechoRepository) {
+    public BrechoController(BrechoService brechoService, VendedorRepository vendedorRepository, JWTGenerator jwtg, BrechoRepository brechoRepository, VendedorImagesRepository vendedorImagesRepository) {
         this.brechoService = brechoService;
         this.vendedorRepository = vendedorRepository;
         this.jwtg = jwtg;
         this.brechoRepository = brechoRepository;
+        this.vendedorImagesRepository = vendedorImagesRepository;
     }
 
     @GetMapping("/meus-brechos")
     public ResponseEntity<?> getBrechosByVendedorId(@RequestHeader("Authorization") String token) {
+
         Map<String, Object> response = new HashMap<>();
         String actualToken = token.replace("Bearer", "");
 
+        if(TokenExpiration.isTokenExpired(token)) {
+            response.put("status", "error");
+            response.put("message", "Sessão expirada, logue novamente.");
+            return ResponseEntity.status(401).body(response);
+        }
+
         Integer userId = jwtg.getUserIdFromJWT(actualToken);
         List<Brecho> brechos = brechoService.getBrechosByVendedorId(userId);
+
 
         String userRole = jwtg.getUserRoleFromJWT(actualToken);
         if(!userRole.equalsIgnoreCase("Vendedor")) {
@@ -92,7 +100,7 @@ public class BrechoController {
         }
 
         response.put("status", "error");
-        response.put("message", "Nenhum endereço encontrado");
+        response.put("message", "Nenhum nome encontrado");
         return ResponseEntity.badRequest().body(response);
     }
 
@@ -153,7 +161,7 @@ public class BrechoController {
         }
 
         response.put("status", "error");
-        response.put("message", "Nenhum endereço encontrado");
+        response.put("message", "Nenhum site encontrado");
         return ResponseEntity.badRequest().body(response);
     }
 
@@ -173,7 +181,7 @@ public class BrechoController {
         }
 
         response.put("status", "error");
-        response.put("message", "Nenhum endereço encontrado");
+        response.put("message", "Nenhum site encontrado");
         return ResponseEntity.badRequest().body(response);
     }
 
@@ -202,7 +210,7 @@ public class BrechoController {
 
 
         Vendedor vendedor = vendedorOptional.get();
-        byte[] imagemBrecho = brechoService.getBrechoImg(vendedor);
+        byte[] imagemBrecho = brechoService.getBrechoImg(userId);
 
         if (!brechos.isEmpty()) {
             List<String> brechoNames = brechos.stream()
@@ -221,39 +229,56 @@ public class BrechoController {
     }
 
     @GetMapping("/imagens")
-    public ResponseEntity<?> getAllBrechosImage() {
+    public ResponseEntity<?> getAllBrechosImage() throws IOException {
         Map<String, Object> response = new HashMap<>();
-        List<String> enderecos = brechoService.getAllBrechoSites();
         List<byte[]> brechosImages = brechoService.getAllBrechoImgs();
+        List<Brecho> vendedores = vendedorImagesRepository.findVendedorBrechos();
 
-        response.put("status", "success");
-
-        if (!enderecos.isEmpty()) {
-            response.put("websites", enderecos);
+        List<String> brechoNome = new ArrayList<>();
+        for (Brecho vendedor : vendedores) {
+            for (Brecho brecho : vendedor.getVendedor().getBrechos()) {
+                brechoNome.add(brecho.getBrechoNome());
+            }
         }
 
         if (!brechosImages.isEmpty()) {
             List<Map<String, Object>> brechosInfo = new ArrayList<>();
+            int imageIndex = 0;
 
-            for (byte[] image : brechosImages) {
-                Map<String, Object> brechoInfo = new HashMap<>();
-                if(brechoService.checkVerifiedImage(image)) {
-                    brechoInfo.put("imagem", Base64.getEncoder().encodeToString(image));
-                    brechosInfo.add(brechoInfo);
-                } else {
-                    System.out.println("Imagem não é verificada.");
+            // Pair images with corresponding names
+            for (String nome : brechoNome) {
+                if (imageIndex < brechosImages.size()) {
+                    Map<String, Object> brechoInfo = new HashMap<>();
+                    byte[] image = brechosImages.get(imageIndex);
+                    if (brechoService.checkVerifiedImage(image)) {
+                        brechoInfo.put("imagem", Base64.getEncoder().encodeToString(image));
+                        brechoInfo.put("brechoNome", nome);  // Include store name with the image
+                        brechosInfo.add(brechoInfo);
+                        imageIndex++;
+                    } else {
+                        System.out.println("Imagem não é verificada.");
+                    }
                 }
             }
 
-            response.put("brechos", brechosInfo);
+            if (brechosInfo.isEmpty()) {
+                response.put("status", "error");
+                response.put("message", "Nenhuma imagem verificada encontrada");
+                response.put("brechos", new ArrayList<>());
+            } else {
+                response.put("status", "success");
+                response.put("brechos", brechosInfo);
+            }
         } else {
-            response.put("status", "success");
+            response.put("status", "error");
             response.put("message", "Nenhuma imagem encontrada");
-            return ResponseEntity.ok().body(response);
+            response.put("brechos", new ArrayList<>());
         }
-
         return ResponseEntity.ok(response);
     }
+
+
+
 
     @PostMapping("/salvar-descricao")
     public ResponseEntity<?> saveText(@RequestHeader("Authorization") String token, @RequestBody() BrechoDescricaoDto brechoDescricaoDto) {
@@ -262,7 +287,7 @@ public class BrechoController {
         String actualToken = token.replace("Bearer", "");
 
         Integer userId = jwtg.getUserIdFromJWT(actualToken);
-
+        System.out.println("Brechó id: " + userId);
         brechoService.updateBrechoDescricao(userId, brechoDescricaoDto);
 
         return ResponseEntity.ok("Texto salvo!");
@@ -274,7 +299,7 @@ public class BrechoController {
 
         String brechoDescricao = brechoService.getBrechoDescricao(brechoId);
 
-        if(brechoDescricao.isEmpty()) {
+        if(brechoDescricao == null) {
             response.put("status", "error");
             response.put("message", "Descrição vazia");
             return ResponseEntity.badRequest().body(response);

@@ -1,10 +1,12 @@
+var currentId;
 $(document).ready(function () {
     $.when(
         $.ajax({ url: `/api/v1/brecho/meus-brechos` }),
         $.ajax({ url: `/api/v1/brecho/endereco` }),
         $.ajax({ url: `/api/v1/brecho/site` }),
-        $.ajax({ url: `/api/v1/brecho/imagem` })
-    ).then(function (nomesResponse, enderecosResponse, siteResponse, imageResponse) {
+        $.ajax({ url: `/api/v1/brecho/imagem` }),
+        $.ajax({ url: `/api/v1/brecho/brechos`})
+    ).then(function (nomesResponse, enderecosResponse, siteResponse, imageResponse, brechosId) {
         if (
             nomesResponse[0].status === "success" &&
             enderecosResponse[0].status === "success" &&
@@ -25,37 +27,49 @@ $(document).ready(function () {
                 },
             ];
 
-
             const container = $(".container-login");
 
             combinedData.forEach(function (data) {
+                
+                brechosId[0].find(brecho => {
+                    if(data.nome === brecho.nome) {
+                        currentId = brecho.id;
+                        return;
+                    };
+                })
+
                 const url = data.site
                     ? data.site.startsWith("http://") || data.site.startsWith("https://")
                         ? data.site
                         : `http://${data.site}`
                     : "#";
-                const imgTag = data.img
-                    ? `<img class="card-img-top" src="data:image/png;base64,${data.img}" alt="Imagem do brechó">`
-                    : `<img class="card-img-top">`;
+                const imgTag = `<img class="card-img-top" src="data:image/png;base64,${data.img}" onerror="this.onerror=null;this.src='../assets/store.png';" >`;
 
                 const card = `
                 <div class="col-12 mt-4">
                     <div class="card">
-                        ${imgTag}
-                        <div class="card-body">
-                            <h5 class="card-title">${data.nome}</h5>
-                            <p class="card-text">Endereço: ${data.endereco}</p>
-                            <p class="card-text">Site: <a href="${url}" target="_blank" rel="noopener noreferrer">${data.site || "Site não informado"}</a></p>
+                    <div class="card-body">
+                        <div class="flex-container">
+                            <div class="left-content">
+                                <h5 class="card-title">${data.nome}</h5>
+                                <p class="card-text">Endereço: ${data.endereco}</p>
+                                <p class="card-text">Site: <a href="${url}" target="_blank" rel="noopener noreferrer">${data.site || "Site não informado"}</a></p>
+                            </div>
+                            <div class="right-img">
+                                ${imgTag}
+                            </div>
+                        </div>
+                        
                             <div id="accordion">
                             <div class="card">
                                 <div class="card-header" id="headingOne">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Collapsible Group Item #1
+                                    Descrição &darr;
                                     </button>
                                 </h5>
                                 </div>
-
+                
                                 <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                                 <div class="card-body">
                                     <textarea id="editableText" maxlength="500" rows="3" placeholder="Coloque a descrição do seu brechó aqui" class="form-control"></textarea>
@@ -69,15 +83,18 @@ $(document).ready(function () {
                 `;
 
                 container.append(card);
+                
             });
+
 
             $('#editableText').each(function () {
                 const $textarea = $(this);
+
                 $.ajax({
-                    url: `/api/v1/brecho/descricao`,
+                    url: `/api/v1/brecho/descricao/${currentId}`,
                     method: 'GET',
                     success: function (response) {
-                        $textarea.val(response); // Populate the textarea
+                        $textarea.val(response.message);
                     },
                     error: function (error) {
                         console.error('Falha ao carregar descrição:', error);
@@ -94,7 +111,16 @@ $(document).ready(function () {
 
 $(document).on('click', '#saveButton', function() {
     const editedText = $('#editableText').val(); 
-    console.log('Texto editado:', editedText); 
+    
+    if(editedText === null || editedText === "") {
+        Swal.fire({
+            icon: 'error',
+            title: 'Descrição vazia',
+            text: 'Não foi possivel salvar a descrição vazia!',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
 
     $.ajax({
         url: '/api/v1/brecho/salvar-descricao', 
@@ -111,7 +137,7 @@ $(document).on('click', '#saveButton', function() {
         },
         error: function(error) {
             console.log(error);
-            alert('Failed to save text!');
+            alert('Erro ao salvar a descrição!');
         }
     });
 });

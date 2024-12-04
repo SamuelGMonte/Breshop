@@ -18,3 +18,30 @@ body {
     font-family: 'Poppins';
 }
 
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.right-img {
+    position: relative;
+    width: 200px;
+    max-width: 100px;
+}
+
+.right-img img {
+    position: absolute;
+    width: 100%;
+}
+
+
+@media (max-width: 357px) {
+    .flex-container {
+        justify-content: center;
+    } 
+    .right-img {
+        display: none;
+    }
+}
