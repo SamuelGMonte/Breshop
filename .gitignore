@@ -35,3 +35,5 @@ build/
 ### CUSTOM ###
 src\main\java\br\com\breshop\security\jwt\SecurityConstants.java
 
+## app properties ##
+application.properties
